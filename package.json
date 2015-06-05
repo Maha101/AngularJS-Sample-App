@@ -1,0 +1,17 @@
+{
+  "name": "InventoryManagement",
+  "version": "0.0.5",
+  "description": "InventoryManagement",
+  "main": "app.js",
+  "author": {
+    "name": "Kiran S J",
+    "email": "kiransj@outlook.com"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/kiransj2/InventoryManagement.git"
+  },
+  "dependencies": {
+    "express": "^4.12.3"
+  }
+}
