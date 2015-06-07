@@ -179,6 +179,20 @@ function get_item_list(callback) {
     return;
 }
 
+function get_current_stocks(callback) {
+    var stmt = format("SELECT item_id, name, quantity FROM current_stocks ORDER BY LOWER(name)");
+    db.execute_query(stmt, function(err, rows) {
+        if(err) {
+            ERROR("current stocks fetch failed with error '%s'", err);
+            callback(true, err);
+            return;
+        }
+        callback(false, rows);
+        return;
+    });
+    return;
+}
+
 // Usage 
 // obj is json with the following variables.
 //      name     => name of the item to which stocks should be added
@@ -346,6 +360,8 @@ module.exports = {
     new_item: insert_item,
     item_id: get_item_id,
     item_list: get_item_list,
+
+    current_stocks: get_current_stocks,
 
     new_stock: add_incoming_stock,
     get_stock_details:get_stock_details

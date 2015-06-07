@@ -49,7 +49,19 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
 });
 
 InventoryApp.controller('incomingstockController', function($scope) {
-    $scope.message = 'Add Incoming Stock to Database';        
+    $scope.message = 'Add Incoming Stock to Database';
+    $.ajax({
+        url: '/api/current_stocks',
+        type: 'GET',        
+        success: function (result) {
+            $scope.stock_list = result;
+        },
+        error: function (error) {
+            $scope.message = 'Failed to current stock list';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });      
 });
 
 InventoryApp.controller('itemListController', function ($scope) {
