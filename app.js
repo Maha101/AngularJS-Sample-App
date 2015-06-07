@@ -48,7 +48,7 @@ app.get('/api/get_item_list', function (req, res) {
 });
 
 app.get('/api/add_item', function (req, res) {
-    INFO("add_item --> %s", req.item.name);
+    INFO("add_item --> %s", req.query.name);
     db.new_item(req.query.name, function (error, msg) {
         if (error === true) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });

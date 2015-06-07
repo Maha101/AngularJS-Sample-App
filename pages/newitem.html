@@ -1,21 +1,21 @@
 <div class="container">
-    <h2>{{message}}</h2>
+    <div class="msg"><h2>{{message}}</h2></div>
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
     <div class="well">
-        <form name="userForm" ng-submit="submitForm()" novalidate>
+        <form name="itemForm" ng-submit="submitForm()" novalidate>
 
             <!-- NAME -->
-            <div class="form-group" ng-class="{ 'has-error' : userForm.name.$invalid && !userForm.name.$pristine }">
+            <div class="form-group" ng-class="{ 'has-error' : itemForm.name.$invalid && !itemForm.name.$pristine }">
                 <label>Item Name</label>
                 <input type="text" name="name" class="form-control"
-                       ng-model="user.name" ng-minlength="3" ng-pattern="itemNamePattern"
+                       ng-model="item.name" ng-minlength="3" ng-pattern="itemNamePattern"
                        required>
-                <p ng-show="userForm.name.$invalid && !userForm.name.$pristine" class="help-block">
+                <p ng-show="itemForm.name.$invalid && !itemForm.name.$pristine" class="help-block">
                     Check the name correctly. Only Letter, numbers, '-', '_' are allowed.
                 </p>
             </div>
 
-            <button type="submit" class="btn btn-primary" ng-disabled="userForm.$invalid">Submit</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid">Submit</button>
         </form>
     </div>
 </div>
