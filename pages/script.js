@@ -17,11 +17,17 @@ InventoryApp.config(function($routeProvider) {
 			controller  : 'aboutController'
 		})
 
-		// route for the contact page
+		// route for the incoming stocks
 		.when('/incomingstock', {
 			templateUrl : 'pages/incomingstock.html',
 			controller  : 'incomingstockController'
-		})
+        })
+
+         // route for the current stocks
+		.when('/currentstock', {
+            templateUrl : 'pages/currentstock.html',
+            controller  : 'currentStockController'
+        })
 
 		// route for the itemlist page
 		.when('/itemlist', {
@@ -51,7 +57,7 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
 InventoryApp.controller('incomingstockController', function($scope) {
     $scope.message = 'Add Incoming Stock to Database';
     $.ajax({
-        url: '/api/current_stocks',
+        url: '/api/get_item_list',
         type: 'GET',        
         success: function (result) {
             $scope.stock_list = result;
@@ -79,7 +85,23 @@ InventoryApp.controller('itemListController', function ($scope) {
             $scope.$apply()
         }
     });
+});
 
+InventoryApp.controller('currentStockController', function ($scope) {
+    $scope.message = 'Current Stocks';
+    // Use Ajax to submit form data
+    $.ajax({
+        url: '/api/current_stocks',
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get current Stocks';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
 });
 
 InventoryApp.controller('newItemController', function ($scope) {
