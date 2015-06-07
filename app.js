@@ -31,6 +31,10 @@ app.get('/pages/*', function(req, res) {
     res.sendFile(__dirname + '/pages/' + req.params[0]);
 });
 
+app.get('/scripts/*', function(req, res) {
+    res.sendFile(__dirname + '/scripts/' + req.params[0]);
+});
+
 app.get('/api/get_item_list', function (req, res) {
     console.log("get_item_list --> ");
     db.item_list(function(err, obj) {

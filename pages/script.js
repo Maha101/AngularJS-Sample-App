@@ -55,5 +55,6 @@ InventoryApp.controller('itemListController', function ($scope) {
         success: function (result) {
             $scope.item_list = result;
         }
+
     });
 });

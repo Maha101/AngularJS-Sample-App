@@ -1,7 +1,16 @@
 <div class="container">
     <h2>Item List</h2>
+    <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
     <div class="well">
-       
+
+        <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-search"></i></div>
+                    <input type="text" class="form-control" placeholder="" ng-model="search" />
+                </div>
+            </div>
+        </form>
         <table class="table table-striped table-bordered ">            
             <thead>
                 <tr>
@@ -12,11 +21,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in item_list | orderBy : 'item_id'">
-                    <td>{{ x.item_id }}</td>
-                    <td>{{ x.name }}</td>
-                    <td>{{ x.dt }}</td>
-                    <td>{{ x.tm }}</td>
+                <tr ng-repeat="item in item_list | filter:search | orderBy:orderByField:reverseSort">
+                    <td>{{ item.item_id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.dt }}</td>
+                    <td>{{ item.tm }}</td>
                 </tr>
             </tbody>
         </table>
