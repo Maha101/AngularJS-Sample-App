@@ -10,13 +10,10 @@ var INFO  = debug('APP:INFO');
 var ERROR = debug('APP:ERR');
 var WARN  = debug('APP:WARN');
 
-var hostname = os.hostname();
-var port = 80;
-var server;
+var hostname = os.hostname(), port = 80, server;
 
 var db_path = '../db/goldennuts.db';
 db.open(db_path, false);
-
 if(db.status() == false) {
     ERROR("unable to open DB");
     process.exit(1);
@@ -47,9 +44,26 @@ app.get('/api/get_item_list', function (req, res) {
         }
         return;
     });
-
     return;
 });
+
+app.get('/api/add_item', function (req, res) {
+    INFO("add_item --> %s", req.item.name);
+    db.new_item(req.query.name, function (error, msg) {
+        if (error === true) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end("could not add " + req.query.name + " to db");
+            ERROR("cound not add element " + req.query.name + " to db due to " + msg);
+            return;
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end("added item " + req.query.name + " to db");
+            INFO("added item " + req.query.name + " to db");
+        }
+        return;
+    });
+});
+
 
 server = http.listen(port, function(){
     console.log("listening on http://%s:%d", hostname, port);

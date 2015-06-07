@@ -1,0 +1,21 @@
+<div class="container">
+    <h2>{{message}}</h2>
+    <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
+    <div class="well">
+        <form name="userForm" ng-submit="submitForm()" novalidate>
+
+            <!-- NAME -->
+            <div class="form-group" ng-class="{ 'has-error' : userForm.name.$invalid && !userForm.name.$pristine }">
+                <label>Item Name</label>
+                <input type="text" name="name" class="form-control"
+                       ng-model="user.name" ng-minlength="3" ng-pattern="itemNamePattern"
+                       required>
+                <p ng-show="userForm.name.$invalid && !userForm.name.$pristine" class="help-block">
+                    Check the name correctly. Only Letter, numbers, '-', '_' are allowed.
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary" ng-disabled="userForm.$invalid">Submit</button>
+        </form>
+    </div>
+</div>
