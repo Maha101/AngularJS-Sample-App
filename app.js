@@ -2,33 +2,48 @@
     http = require('http').Server(app),
     os = require('os'),
     url = require('url'),
-    util = require('util');
+    db  = require('./src/db');
+    util = require('util'),
+    debug = require('debug');
+
+var INFO  = debug('APP:INFO');
+var ERROR = debug('APP:ERR');
+var WARN  = debug('APP:WARN');
 
 var hostname = os.hostname();
 var port = 80;
 var server;
 
+var db_path = '../db/goldennuts.db';
+db.open(db_path, false);
+
+if(db.status() == false) {
+    ERROR("unable to open DB");
+    process.exit(1);
+}
 
 app.get('/', function (req, res) {
     //console.log("username: %s", req.user);
     res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/*', function(req, res) {
-    res.sendFile(__dirname + '/' + req.params[0]);
+app.get('/pages/*', function(req, res) {
+    res.sendFile(__dirname + '/pages/' + req.params[0]);
 });
 
 app.get('/api/get_item_list', function (req, res) {
     console.log("get_item_list --> ");
-    
-    var json= [{"item_id":1,"name":"cashew","dt":"2015-06-04","tm":"17-22-58"},
-               {"item_id":4,"name":"cashew-jh","dt":"2015-06-04","tm":"17-22-58"},
-               {"item_id":3,"name":"cashew-round","dt":"2015-06-04","tm":"17-22-58"},
-               {"item_id":2,"name":"kiss-miss","dt":"2015-06-04","tm":"17-22-58"},
-               {"item_id":5,"name":"pepper","dt":"2015-06-04","tm":"17-22-58"}]
+    db.item_list(function(err, obj) {
+        if(err == true) {
+            res.writeHead(404, { 'Content-Type': 'plain/text' });
+            res.end(obj);
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(obj));
+        }
+        return;
+    });
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(json));
     return;
 });
 

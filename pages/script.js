@@ -48,4 +48,12 @@ InventoryApp.controller('contactController', function($scope) {
 
 InventoryApp.controller('itemListController', function ($scope) {
     $scope.message = 'Item List';
+    // Use Ajax to submit form data
+    $.ajax({
+        url: '/api/get_item_list',
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+        }
+    });
 });
