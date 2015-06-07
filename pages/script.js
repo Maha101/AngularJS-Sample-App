@@ -59,9 +59,15 @@ InventoryApp.controller('itemListController', function ($scope) {
         url: '/api/get_item_list',
         type: 'GET',        
         success: function (result) {
-            $scope.item_list = result;
+            $scope.item_list = result;            
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get item list';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply() 
         }
-    });
+    })
+
 });
 
 InventoryApp.controller('newItemController', function ($scope) {
@@ -85,6 +91,42 @@ InventoryApp.controller('newItemController', function ($scope) {
     // function to submit the form after all validation has occurred            
     $scope.submitForm = function () {        
         // check to make sure the form is completely valid        
-        alert('our form is amazing' + $scope.user.name);   
+        alert('New Item Name ' + $scope.user.name);   
     };
 });
+
+InventoryApp.service(
+    "db_service",
+    function ($http, $q) {        
+        // Return public API.
+        return ({
+            item_list: addFriend         
+        });
+
+        function item_list() {            
+            var request = $http({
+                method: "get",
+                url: "/api/get_item_list",
+                params: {
+                    action: "get"
+                }
+            });            
+            return (request.then(handleSuccess, handleError));
+        }
+                      
+        function handleError(response) {            
+            if (!angular.isObject(response.data) ||
+                !response.data.message) {                
+                return ($q.reject("An unknown error occurred."));
+            }            
+            // Otherwise, use expected error message.
+            return ($q.reject(response.data.message));
+        }
+                      
+        function handleSuccess(response) {            
+            return (response.data);
+        }
+
+    }
+);
+
