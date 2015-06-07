@@ -60,7 +60,8 @@ InventoryApp.controller('incomingstockController', function($scope) {
         url: '/api/get_item_list',
         type: 'GET',        
         success: function (result) {
-            $scope.stock_list = result;
+            $scope.item_list = result;
+            $scope.$apply();
         },
         error: function (error) {
             $scope.message = 'Failed to current stock list';

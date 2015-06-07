@@ -9,9 +9,9 @@
                 height: 24px;
             }
             select,input {
-                height: 30px;
+                height: 31px;
                 width: 70%;
-                padding: 0.1rem;
+                padding: 0.2rem;
                 text-align:left;
             }
         </style>        
@@ -19,56 +19,74 @@
             <form name="incomingItems" ng-submit="submitStock()" novalidate>
                 <table class="table table-striped table-bordered">
                     <tr>
-                        <th>Index</th>
-                        <th>Item Name</th>
-                        <th>Qty (in kgs)</th>
-                        <th>Cost</th>
-                        <th></th>
-                    </tr>
-                    <tr ng:repeat="item in invoice.items">
-                        <td>{{$index+1}}</td>
-                        <td> <select id="sel" class="input-block-level" ng-model="item.name"
-                                    ng-options="obj.name as obj.name for obj in item.current_stock.data"
-                                    ng:change='selectedItem(item.name)'
-                                    ng:required>                                                                
-                        </select> </td>
-
                         <td>
-                            <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001">
-                        </td>
-
-                        <td>
-                            <input type="number" ng:model="item.cost" ng:required class="input-mini" step="1">
+                            Item
+                            <select id="sel" class="input-block-level" ng-model="item.name"
+                                    ng:change='selectedItem(name)'
+                                    ng:required tabindex="1">
+                                <option ng-repeat="item in item_list" value="{{item.name}}">
+                                    {{item.name}}
+                                </option>
+                            </select>
                         </td>
                         <td>
-                            <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
+                            Quantity
+                            <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001" 
+                                   tabindex="2">
                         </td>
-                    </tr>
-                    <tr>                        
-                        <td><a ng:click="addItem()" class="btn btn-primary">add item</a></td>
-                        <td><b> <font color="red">{{repeated_items()}}</font></b></td>
-                        <td><b><font color="blue">Total: {{total_weight()}}</font></b></td>
-                        <td><b><font color="blue">Total: Rs {{total_cost()}}</font></b></td>
+                        <td>
+                            Price Paid
+                            <input type="number" ng:model="item.cost" ng:required class="input-mini" step="1" 
+                                   tabindex="3">
+                        </td>
+                        <td>
+                            <a ng:click="addItem()" class="btn btn-primary" tabindex="4">add item</a>
+                        </td>
                     </tr>
                 </table>
-                <button type="submit" class="btn btn-primary" ng-disabled="incomingItems.$invalid">Submit</button>
-            </form>
+            </form>    
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>Index</th>
+                    <th>Item Name</th>
+                    <th>Qty [ Total: {{total_weight()}} ]</th>
+                    <th>Cost [ Total: {{total_cost()}} ]</th>
+                    <th></th>
+                </tr>
+                <tr ng:repeat="item in invoice.items">
+                    <td>{{$index+1}}</td>
+                    <td>
+                        <input type="text" ng:model="item.name" ng:required class="input-mini" readonly>
+                    </td>
+                    <td>
+                        <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001">
+                    </td>
+
+                    <td>
+                        <input type="number" ng:model="item.cost" ng:required class="input-mini" step="1">
+                    </td>
+                    <td>
+                        <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
+                    </td>
+                </tr>
+            </table>                         
         </div>
         <script>
             function InputForm($scope) {
                 $scope.invoice = {
-                    items: []
-                };
+                    items: [],
+                    
+                };               
 
-                $scope.addItem = function () {
-                    $scope.invoice.items.push({
-                        qty: .001,
-                        name: $scope.stock_list[0].name,
-                        cost: 1,
-                        current_stock: {
-                            data: $scope.stock_list
-                        }
+                $scope.addItem = function () {                    
+                    $scope.invoice.items.unshift({
+                        qty: $scope.item.qty,
+                        name: $scope.item.name,
+                        cost: $scope.item.cost
                     });
+                    $scope.item.qty = 0;
+                    $scope.item.name = -1;
+                    $scope.item.cost = 0;
                 }
 
                 $scope.removeItem = function (index) {
