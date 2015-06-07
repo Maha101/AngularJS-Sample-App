@@ -21,10 +21,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="item in item_list | filter:search | orderBy:Quantity">
+                <tr ng-repeat="item in item_list | filter:search | orderBy:'quantity'" 
+                    ng-style="{'color': (item.quantity < 1000 ? 'red' : (item.quantity < 3000 ? 'blue' : 'black'))}">
                     <td>{{ item.item_id }}</td>
                     <td>{{ item.name }}</td>
-                    <td ng-style="{'color': (item.quantity < 1000 ? 'red' : (item.quantity < 3000 ? 'blue' : 'black'))}">
+                    <td>
                         {{ (item.quantity/1000).toFixed(3) }}
                     </td>
                 </tr>
