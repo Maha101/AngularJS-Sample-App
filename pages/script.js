@@ -18,9 +18,9 @@ InventoryApp.config(function($routeProvider) {
 		})
 
 		// route for the contact page
-		.when('/contact', {
-			templateUrl : 'pages/contact.html',
-			controller  : 'contactController'
+		.when('/incomingstock', {
+			templateUrl : 'pages/incomingstock.html',
+			controller  : 'incomingstockController'
 		})
 
 		// route for the itemlist page
@@ -48,8 +48,8 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
     //$scope.userName = "kiran" + $routeParams.userName;
 });
 
-InventoryApp.controller('contactController', function($scope) {
-    $scope.message = 'Contact us! JK. This is just a demo.';        
+InventoryApp.controller('incomingstockController', function($scope) {
+    $scope.message = 'Add Incoming Stock to Database';        
 });
 
 InventoryApp.controller('itemListController', function ($scope) {
