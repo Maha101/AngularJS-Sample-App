@@ -18,9 +18,9 @@ InventoryApp.config(function($routeProvider) {
 		})
 
 		// route for the incoming stocks
-		.when('/incomingstock', {
-			templateUrl : 'pages/incomingstock.html',
-			controller  : 'incomingstockController'
+		.when('/addincomingstock', {
+			templateUrl : 'pages/addincomingstock.html',
+			controller  : 'addIncomingStockController'
         })
 
          // route for the current stocks
@@ -54,8 +54,8 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
     //$scope.userName = "kiran" + $routeParams.userName;
 });
 
-InventoryApp.controller('incomingstockController', function($scope) {
-    $scope.message = 'Add Incoming Stock to Database';
+InventoryApp.controller('addIncomingStockController', function($scope) {
+    $scope.message = 'Add Incoming Stock to Database';    
     $.ajax({
         url: '/api/get_item_list',
         type: 'GET',        
@@ -68,12 +68,19 @@ InventoryApp.controller('incomingstockController', function($scope) {
             angular.element('.container').css('background-color', '#FF0000');
             $scope.$apply()
         }
-    });      
+    });
+
+    $scope.$on('$locationChangeStart', function (event) {        
+            var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
+            if (!answer) {
+                event.preventDefault();
+            }        
+    });
 });
 
 InventoryApp.controller('itemListController', function ($scope) {
     $scope.message = 'Item List';
-    // Use Ajax to submit form data
+    
     $.ajax({
         url: '/api/get_item_list',
         type: 'GET',        
@@ -107,6 +114,19 @@ InventoryApp.controller('currentStockController', function ($scope) {
 
 InventoryApp.controller('newItemController', function ($scope) {
     $scope.message = 'Add New Item';
+    
+    $.ajax({
+        url: '/api/get_item_list',
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get item list';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
     
     $scope.itemNamePattern = (function () {        
         return {

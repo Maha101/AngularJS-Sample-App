@@ -17,16 +17,14 @@
                 <tr>
                     <th>Item ID</th>
                     <th>Item Name</th>
-                    <th>Date</th>
-                    <th>Time</th>
+                    <th>Date</th>                    
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="item in item_list | filter:search | orderBy:orderByField:reverseSort">
                     <td>{{ item.item_id }}</td>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.dt }}</td>
-                    <td>{{ item.tm }}</td>
+                    <td>{{ item.dt }}</td>                    
                 </tr>
             </tbody>
         </table>
