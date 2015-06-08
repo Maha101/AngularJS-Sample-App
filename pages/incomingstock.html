@@ -23,7 +23,7 @@
                             Item
                             <select id="sel" class="input-block-level" ng-model="item.name"
                                     ng:change='selectedItem(name)'
-                                    ng:required tabindex="1">
+                                    ng:required tabindex="1" >
                                 <option ng-repeat="item in item_list" value="{{item.name}}">
                                     {{item.name}}
                                 </option>
@@ -32,7 +32,8 @@
                         <td>
                             Quantity
                             <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001" 
-                                   tabindex="2">
+                                   tabindex="2"><br/>
+                            <span>{{qty_to_string(item.qty)}}</span>
                         </td>
                         <td>
                             Price Paid
@@ -40,7 +41,10 @@
                                    tabindex="3">
                         </td>
                         <td>
-                            <a ng:click="addItem()" class="btn btn-primary" tabindex="4">add item</a>
+                            <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="4"/>
+                        </td>
+                        <td>
+                            <input type="submit" value="submit" class="btn btn-primary" />
                         </td>
                     </tr>
                 </table>
@@ -49,21 +53,21 @@
                 <tr>
                     <th>Index</th>
                     <th>Item Name</th>
-                    <th>Qty [ Total: {{total_weight()}} ]</th>
-                    <th>Cost [ Total: {{total_cost()}} ]</th>
+                    <th>Qty <font color="blue">[ Total: {{total_weight()}} ]</font></th>
+                    <th>Cost <font color="blue"> [ Total: Rs {{total_cost()}} ]</font></th>
                     <th></th>
                 </tr>
                 <tr ng:repeat="item in invoice.items">
                     <td>{{$index+1}}</td>
                     <td>
-                        <input type="text" ng:model="item.name" ng:required class="input-mini" readonly>
+                        <input type="text" ng:model="item.name" ng:required class="input-mini" disabled>
                     </td>
                     <td>
-                        <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001">
+                        <input type="number" ng:model="item.qty" ng:required class="input-mini" step=".001" min=".01">
                     </td>
 
                     <td>
-                        <input type="number" ng:model="item.cost" ng:required class="input-mini" step="1">
+                        <input type="number" ng:model="item.cost" ng:required class="input-mini" step="1" min="1">
                     </td>
                     <td>
                         <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
@@ -78,7 +82,14 @@
                     
                 };               
 
-                $scope.addItem = function () {                    
+                $scope.addItem = function () {
+                    // verify the input paramters
+                    if($scope.item.name == -1 ||
+                      ($scope.item.qty < 0.01 || $scope.item.qty > 250) ||
+                      ($scope.item.cost < 1 || $scope.item.cost > 25000)) {
+                        sweetAlert("Verify the name, quantity and cost again", "", "error");
+                        return;
+                    }
                     $scope.invoice.items.unshift({
                         qty: $scope.item.qty,
                         name: $scope.item.name,
@@ -102,15 +113,20 @@
                     return total;
                 }
 
+                $scope.qty_to_string = function (total) {
+                    if (typeof total != 'number') return "";
+                    if (total == 0) return "";
+                    var kg = Math.floor(total);
+                    var gm = ((total - kg)*1000).toFixed(0);
+                    return kg + "kg " + gm + "gm";
+                }
+
                 $scope.total_weight = function () {
                     var total = 0;
                     angular.forEach($scope.invoice.items, function (item) {
                         total += item.qty;
                     });
-
-                    var kg = Math.floor(total);
-                    var gm = ((total - kg)*1000).toFixed(0);
-                    return kg + "kg " + gm + "gm";
+                    return $scope.qty_to_string(total);                    
                 }
 
                 $scope.selectedItem = function (name) {
@@ -140,7 +156,7 @@
                     angular.forEach($scope.invoice.items, function (item) {
                         total_qty += item.qty;
                         total_cost += item.cost;
-                        //alert(item.name);
+                        
                         if (map[item.name] == 1) {
                             list = list == "" ? item.name : (list + "," + item.name);
                             map[item.name] = 2;
@@ -148,7 +164,7 @@
                             map[item.name] = 1; 
                         }
                     });
-                    //alert(total_qty + " " + total_cost);
+                    
                     if (list !== "") {
                         sweetAlert("element '" + list + "'  is repeated", "", "error");
                     } else {
