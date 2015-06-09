@@ -2,11 +2,21 @@
     <h2>{{message}}</h2>
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
+
     <div class="well" ng:controller="incomingStockSummary">
-        <form>
-            From <input type="date" ng-model="from">
-            To <input type="date" ng-model="to">
+        <form ng-submit="load_page()">
+            <style>
+                input[type=date] {
+                    height: 35px;
+                    text-align: center;
+                    width: 100px;
+                }
+            </style>
+            From <input type="text" id="datepicker"  ng-model="from" ng-required ng-minlength="10" ng-maxlength="10">
+            To <input type="text" id="datepicker" ng-model="to" ng-required>            
+            <input type="submit" value="submit" class="btn btn-primary" />            
         </form>
+
         <br />
         <form>
             <div class="form-group">
@@ -19,13 +29,15 @@
         <table class="table table-striped table-bordered ">
             <thead>
                 <tr>
-                    <th> Name <font color="blue">[ Total: {{total_items()}} ]</font></th>
+                    <th> Index <font color="blue">[ Total: {{total_items()}} ] </font></th>
+                    <th> Name </th>
                     <th> Quantity <font color="blue">[ Total: {{total_quantity()}} ] </font></th>
                     <th> Price <font color="blue"> [ Total: {{total_price()}} ]</font></th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:'dt'">
+                    <td>{{$index+1}}</td>
                     <td>{{row.name}}</td>
                     <td>{{(row.quantity/1000).toFixed(3)}}</td>
                     <td>{{row.price}}</td>
@@ -35,6 +47,21 @@
     </div>
     <script>
         function incomingStockSummary($scope) {
+            $scope.load_page = function () {                
+                $.ajax({
+                    url: '/api/get_incoming_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
+                    type: 'GET',
+                    success: function (result) {
+                        $scope.item_list = result;
+                        $scope.$apply();
+                    },
+                    error: function (error) {
+                        $scope.message = 'Failed to get incoming Stock Summary';
+                        angular.element('.container').css('background-color', '#FF0000');
+                        $scope.$apply()
+                    }
+                });
+            }
             $scope.total_quantity = function () {
                 var total = 0;
                 angular.forEach($scope.filtered_item_list, function (item) {

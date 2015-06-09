@@ -40,6 +40,10 @@ InventoryApp.config(function($routeProvider) {
             controller  : 'incomingStockSummaryController'
         })
 
+        .when('/incomingStockTransaction', {
+            templateUrl : 'pages/incomingstocksTransaction.html',
+            controller  : 'incomingStockTransactionController'
+        })
 		// route for the add_new_item page
 		.when('/newitem', {
             templateUrl : 'pages/newitem.html',
@@ -176,13 +180,33 @@ InventoryApp.controller('newItemController', function ($scope) {
     };
 });
 
-InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {
+InventoryApp.controller('incomingStockSummaryController', function ($scope) {
+    $scope.from = '2015-05-01';
+    $scope.to = '2020-12-31';
+    $scope.message = 'Incoming Stocks Summary from ' + $scope.from + " to " + $scope.to;
+    // Use Ajax to submit form data
+    $.ajax({
+        url: '/api/get_incoming_stock?summary=true&from='+$scope.from+"&to="+$scope.to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get Incoming Stock Summary';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+});
+
+InventoryApp.controller('incomingStockTransactionController', function ($scope, $routeParams) {
     $scope.from = $routeParams.from;
-    $scope.to = $routeParams.to;    
+    $scope.to = $routeParams.to;
     $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
     // Use Ajax to submit form data
     $.ajax({
-        url: '/api/get_incoming_stock?summary=true&from='+$routeParams.from+"&to="+$routeParams.to,
+        url: '/api/get_incoming_stock?summary=false&from=' + $routeParams.from + "&to=" + $routeParams.to,
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;

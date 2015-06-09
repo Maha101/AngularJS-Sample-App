@@ -1,0 +1,65 @@
+﻿<div class="container">
+    <h2>{{message}}</h2>
+
+    <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
+    <div class="well" ng:controller="incomingStockTransaction">
+        <form>
+            From <input type="date" ng-model="from">
+            To <input type="date" ng-model="to">
+        </form>
+        <br />
+        <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-search"></i></div>
+                    <input type="text" class="form-control" placeholder="" ng-model="search" />
+                </div>
+            </div>
+        </form>
+        <table class="table table-striped table-bordered ">
+            <thead>
+                <tr>
+                    <th> Trans Id  <font color="blue">[ Total: {{total_items()}} ] </font></th>
+                    <th> Item Name </th>
+                    <th> quantity  <font color="blue">[ Total: {{total_quantity()}} ] </font></th>
+                    <th> price     <font color="blue"> [ Total: {{total_price()}} ]</font></th>
+                    <th> date      </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:'dt'">
+                    <td>{{row.transaction_id}}</td>                    
+                    <td>{{row.name}}</td>
+                    <td>{{(row.quantity/1000).toFixed(3)}}</td>
+                    <td>{{row.price}}</td>                    
+                    <td>{{row.dt}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function incomingStockTransaction($scope) {
+        $scope.total_quantity = function () {
+            var total = 0;
+            angular.forEach($scope.filtered_item_list, function (item) {
+                total += item.quantity;
+            })
+            return (total / 1000).toFixed(3) + "Kg";
+        }
+
+        $scope.total_price = function () {
+            var total = 0;
+            angular.forEach($scope.filtered_item_list, function (item) {
+                total += item.price;
+            })
+            return total;
+        }
+
+        $scope.total_items = function () {
+            return $scope.filtered_item_list.length;
+        }
+    }
+    </script>
+
+</div>
+<!--http://plnkr.co/edit/7SqPoD2u323KKzi0SYpa?p=preview-->
