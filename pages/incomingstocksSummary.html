@@ -2,7 +2,12 @@
     <h2>{{message}}</h2>
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
-    <div class="well">
+    <div class="well" ng:controller="incomingStockSummary">
+        <form>
+            From <input type="date" ng-model="from">
+            To <input type="date" ng-model="to">
+        </form>
+        <br />
         <form>
             <div class="form-group">
                 <div class="input-group">
@@ -14,13 +19,13 @@
         <table class="table table-striped table-bordered ">
             <thead>
                 <tr>
-                    <th> Name </th>
-                    <th> Quantity </th>
-                    <th> Price </th>
+                    <th> Name <font color="blue">[ Total: {{total_items()}} ]</font></th>
+                    <th> Quantity <font color="blue">[ Total: {{total_quantity()}} ] </font></th>
+                    <th> Price <font color="blue"> [ Total: {{total_price()}} ]</font></th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in item_list | filter:search | orderBy:'dt'">
+                <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:'dt'">
                     <td>{{row.name}}</td>
                     <td>{{(row.quantity/1000).toFixed(3)}}</td>
                     <td>{{row.price}}</td>
@@ -28,5 +33,28 @@
             </tbody>
         </table>
     </div>
+    <script>
+        function incomingStockSummary($scope) {
+            $scope.total_quantity = function () {
+                var total = 0;
+                angular.forEach($scope.filtered_item_list, function (item) {
+                    total += item.quantity;
+                })
+                return (total/1000).toFixed(3) + "Kg";
+            }
+
+            $scope.total_price = function (){
+                var total = 0;
+                angular.forEach($scope.filtered_item_list, function (item) {
+                    total += item.price;
+                })
+                return total;
+            }
+
+            $scope.total_items = function () {                
+                return $scope.filtered_item_list.length;
+            }
+        }
+    </script>
 </div>
 <!--http://plnkr.co/edit/7SqPoD2u323KKzi0SYpa?p=preview-->

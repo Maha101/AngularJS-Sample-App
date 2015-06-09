@@ -13,7 +13,7 @@
             }
         </style>        
         <div ng:controller="InputForm">
-            <form name="incomingItems" ng-submit="submitStock()" novalidate>
+            <form name="incomingItems" ng-submit="submitStock()" >
                 <table class="table table-striped table-bordered table-condensed">
                     <tr>
                         <td>
@@ -27,12 +27,12 @@
                         </td>
                         <td>
                             Quantity
-                            <input type="number" ng:model="item.qty" ng:required step=".001" tabindex="2"><br />
+                            <input type="number" ng:model="item.qty" ng:required step=".001" min=".01" tabindex="2" max="{{config.max_qty}}" placeholder="Enter Qunatity"><br />
                             <span>{{qty_to_string(item.qty)}}</span>
                         </td>
                         <td>
                             Price Paid
-                            <input type="number" ng:model="item.cost" ng:required step="1" tabindex="3">
+                            <input type="number" ng:model="item.cost" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost">
                         </td>
                         <td>
                             <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="4" />
@@ -78,9 +78,15 @@
 
                 $scope.addItem = function () {
                     // verify the input paramters
+                    if(typeof $scope.item.name !== 'string' ||
+                        typeof $scope.item.qty !== 'number' ||
+                        typeof $scope.item.cost !== 'number') {
+                        sweetAlert("Verify the name, quantity and cost again", "", "error");
+                        return;
+                    }
                     if($scope.item.name == -1 ||
-                      ($scope.item.qty < 0.01 || $scope.item.qty > 250) ||
-                      ($scope.item.cost < 1 || $scope.item.cost > 25000)) {
+                      ($scope.item.qty < 0.01 || $scope.item.qty > $scope.config.max_qty) ||
+                      ($scope.item.cost < 1 || $scope.item.cost > $scope.config.max_price)) {
                         sweetAlert("Verify the name, quantity and cost again", "", "error");
                         return;
                     }

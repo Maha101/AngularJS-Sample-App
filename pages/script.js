@@ -60,7 +60,11 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
 });
 
 InventoryApp.controller('addIncomingStockController', function($scope) {
-    $scope.message = 'Add Incoming Stock to Database';    
+    $scope.message = 'Add Incoming Stock to Database';
+    $scope.config = {
+        max_qty: 250,
+        max_price: 75000
+    }
     $.ajax({
         url: '/api/get_item_list',
         type: 'GET',        
@@ -173,17 +177,19 @@ InventoryApp.controller('newItemController', function ($scope) {
 });
 
 InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {
-    $scope.message = 'Incoming Stocks Details';
+    $scope.from = $routeParams.from;
+    $scope.to = $routeParams.to;    
+    $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
     // Use Ajax to submit form data
     $.ajax({
-        url: '/api/get_incoming_stock?from=2015-01-01&to=2015-10-08&summary=true',
+        url: '/api/get_incoming_stock?summary=true&from='+$routeParams.from+"&to="+$routeParams.to,
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
             $scope.$apply();
         },
         error: function (error) {
-            $scope.message = 'Failed to get current Stocks';
+            $scope.message = 'Failed to get incoming Stock';
             angular.element('.container').css('background-color', '#FF0000');
             $scope.$apply()
         }
