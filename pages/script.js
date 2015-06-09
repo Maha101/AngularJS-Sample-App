@@ -180,9 +180,10 @@ InventoryApp.controller('newItemController', function ($scope) {
     };
 });
 
-InventoryApp.controller('incomingStockSummaryController', function ($scope) {
-    $scope.from = '2015-05-01';
-    $scope.to = '2020-12-31';
+InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {
+    
+    $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
     $scope.message = 'Incoming Stocks Summary from ' + $scope.from + " to " + $scope.to;
     // Use Ajax to submit form data
     $.ajax({
@@ -200,9 +201,10 @@ InventoryApp.controller('incomingStockSummaryController', function ($scope) {
     });
 });
 
-InventoryApp.controller('incomingStockTransactionController', function ($scope, $routeParams) {
-    $scope.from = $routeParams.from;
-    $scope.to = $routeParams.to;
+InventoryApp.controller('incomingStockTransactionController', function ($scope, $routeParams) {    
+    $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
+
     $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
     // Use Ajax to submit form data
     $.ajax({

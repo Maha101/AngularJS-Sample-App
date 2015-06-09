@@ -12,8 +12,8 @@
                     width: 100px;
                 }
             </style>
-            From <input type="text" id="datepicker"  ng-model="from" ng-required ng-minlength="10" ng-maxlength="10">
-            To <input type="text" id="datepicker" ng-model="to" ng-required>            
+            From <input type="text" id="from_date" ng-model="from" >
+            To <input type="text" id="to_date" ng-model="to" >                   
             <input type="submit" value="submit" class="btn btn-primary" />            
         </form>
 
@@ -53,6 +53,7 @@
                     type: 'GET',
                     success: function (result) {
                         $scope.item_list = result;
+                        $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
                         $scope.$apply();
                     },
                     error: function (error) {
@@ -80,7 +81,15 @@
 
             $scope.total_items = function () {                
                 return $scope.filtered_item_list.length;
-            }
+            }            
+
+            $('#from_date').datepicker({
+                format: "yyyy-mm-dd"
+            });
+            
+            $('#to_date').datepicker({
+                format: "yyyy-mm-dd"
+            });
         }
     </script>
 </div>
