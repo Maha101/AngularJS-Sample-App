@@ -45,7 +45,7 @@
             </form>    
             <table class="table table-striped table-bordered">
                 <tr>
-                    <th>Index</th>
+                    <th>Index <font color="blue"> [ Total: {{invoice.items.length}} ]</font></th>
                     <th>Item Name <font color="red"> {{repeated_items()}}</font></th>
                     <th>Qty <font color="blue">[ Total: {{total_weight()}} ]</font></th>
                     <th>Cost <font color="blue"> [ Total: Rs {{total_cost()}} ]</font></th>
@@ -57,7 +57,7 @@
                        <span> {{item.name}}</span>
                     </td>
                     <td>
-                        <span> {{item.qty}}</span>
+                        <span> {{qty_to_string(item.qty)}}</span>
                     </td>
 
                     <td>                        
@@ -73,20 +73,17 @@
             function InputForm($scope) {
                 $scope.invoice = {
                     items: [],
-                    
                 };               
 
                 $scope.addItem = function () {
                     // verify the input paramters
                     if(typeof $scope.item.name !== 'string' ||
-                        typeof $scope.item.qty !== 'number' ||
-                        typeof $scope.item.cost !== 'number') {
-                        sweetAlert("Verify the name, quantity and cost again", "", "error");
-                        return;
-                    }
-                    if($scope.item.name == -1 ||
-                      ($scope.item.qty < 0.01 || $scope.item.qty > $scope.config.max_qty) ||
-                      ($scope.item.cost < 1 || $scope.item.cost > $scope.config.max_price)) {
+                       typeof $scope.item.qty !== 'number'  ||
+                       typeof $scope.item.cost !== 'number' ||
+                       $scope.item.name == -1 ||
+                       $scope.item.qty < 0.01 || $scope.item.qty > $scope.config.max_qty ||
+                       $scope.item.cost < 1   || $scope.item.cost > $scope.config.max_price)
+                    {
                         sweetAlert("Verify the name, quantity and cost again", "", "error");
                         return;
                     }
@@ -108,16 +105,23 @@
                     var total = 0;
                     angular.forEach($scope.invoice.items, function (item) {
                         total += item.cost;
-                    })
-
+                    });
                     return total;
                 }
 
                 $scope.qty_to_string = function (total) {
-                    if (typeof total != 'number') return "";
-                    if (total == 0) return "";
+                    if (typeof total != 'number' ||
+                        total == 0) {
+                        return "";
+                    }
+                    
                     var kg = Math.floor(total);
-                    var gm = ((total - kg)*1000).toFixed(0);
+                    var gm = ((total - kg) * 1000).toFixed(0);
+                    if (kg == 0) {
+                        return "" + gm + "gm";
+                    } else if (gm == 0) {
+                        return "" + kg + "kg";
+                    }
                     return kg + "kg " + gm + "gm";
                 }
 
@@ -150,25 +154,18 @@
                     return "[item " + list + " is repeated]";
                 }
 
-                $scope.submitStock = function () {
-                    var map = [], list =  "" ;
+                $scope.submitStock = function () {                    
                     var total_qty = 0, total_cost = 0;
                     angular.forEach($scope.invoice.items, function (item) {
                         total_qty += item.qty;
                         total_cost += item.cost;
-                        
-                        if (map[item.name] == 1) {
-                            list = list == "" ? item.name : (list + "," + item.name);
-                            map[item.name] = 2;
-                        } else {                        
-                            map[item.name] = 1; 
-                        }
                     });
-                                        
+                    var list = repeated_items();
                     if (list !== "") {
-                        sweetAlert("element '" + list + "'  is repeated", "", "error");
+                        sweetAlert(list, "", "error");
+                        return;
                     } else {
-                        sweetAlert("Total Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost, "");
+                        sweetAlert("Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost, "");
                     }
                 }
             }

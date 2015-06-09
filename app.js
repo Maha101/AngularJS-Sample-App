@@ -47,22 +47,6 @@ app.get('/api/get_item_list', function (req, res) {
     return;
 });
 
-app.get('/api/current_stocks', function (req, res) {
-    INFO("get_item_list --> ");
-    db.current_stocks(function(err, obj) {
-        if(err == true) {
-            res.writeHead(404, { 'Content-Type': 'plain/text' });
-            ERROR("%s", obj);
-            res.end(obj);
-        } else {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(obj));
-        }
-        return;
-    });
-    return;
-});
-
 app.get('/api/add_item', function (req, res) {
     INFO("add_item --> %s", req.query.name);
     db.new_item(req.query.name, function (error, msg) {
@@ -78,6 +62,22 @@ app.get('/api/add_item', function (req, res) {
         }
         return;
     });
+});
+
+app.get('/api/current_stocks', function (req, res) {
+    INFO("get_item_list --> ");
+    db.current_stocks(function(err, obj) {
+        if(err == true) {
+            res.writeHead(404, { 'Content-Type': 'plain/text' });
+            ERROR("%s", obj);
+            res.end(obj);
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(obj));
+        }
+        return;
+    });
+    return;
 });
 
 app.get('/api/get_incoming_stock', function (req, res) {
@@ -107,6 +107,28 @@ app.get('/api/get_incoming_stock', function (req, res) {
         } else {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(rows));
+        }
+        return;
+    });
+});
+
+app.get('/api/add_stock', function (req, res) {
+    var obj = {};
+    INFO("add stock %d gm of %s at Rs %d", req.query.quantity, req.query.name, req.query.price);
+    
+    obj.name = req.query.name;
+    obj.quantity = req.query.quantity;
+    obj.price = req.query.price;
+    db_logic.new_stock(obj, function (error, msg) {
+        if (error === true) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end(msg);
+            ERROR(msg);
+            return;
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(msg);
+            INFO("added " + obj.quantity + " of " + req.query.name + " to DB.");
         }
         return;
     });

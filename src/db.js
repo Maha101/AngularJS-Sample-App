@@ -365,6 +365,6 @@ module.exports = {
 
     current_stocks: get_current_stocks,
 
-    new_stock: add_incoming_stock,
+    add_stock: add_incoming_stock,
     get_stock_details:get_stock_details
 };
