@@ -3,9 +3,10 @@
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
     <div class="well" ng:controller="incomingStockTransaction">
-        <form>
-            From <input type="date" ng-model="from">
-            To <input type="date" ng-model="to">
+        <form ng-submit="load_page()">
+            From <input type="text" id="from_date" ng-model="from">
+            To <input type="text" id="to_date" ng-model="to">
+            <input type="submit" value="submit" class="btn btn-primary" />
         </form>
         <br />
         <form>
@@ -39,6 +40,22 @@
     </div>
     <script>
         function incomingStockTransaction($scope) {
+            $scope.load_page = function () {                
+            $.ajax({
+                url: '/api/get_incoming_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
+                type: 'GET',
+                success: function (result) {
+                    $scope.item_list = result;
+                    $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
+                    $scope.$apply();
+                },
+                error: function (error) {
+                    $scope.message = 'Failed to get incoming Stock Details';
+                    angular.element('.container').css('background-color', '#FF0000');
+                    $scope.$apply()
+                }
+            });
+        }
         $scope.total_quantity = function () {
             var total = 0;
             angular.forEach($scope.filtered_item_list, function (item) {
@@ -58,6 +75,14 @@
         $scope.total_items = function () {
             return $scope.filtered_item_list.length;
         }
+
+        $('#from_date').datepicker({
+            format: "yyyy-mm-dd"
+        });
+
+        $('#to_date').datepicker({
+            format: "yyyy-mm-dd"
+        });
     }
     </script>
 
