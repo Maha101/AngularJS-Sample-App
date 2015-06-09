@@ -17,7 +17,7 @@ InventoryApp.config(function($routeProvider) {
 			controller  : 'aboutController'
 		})
 
-		// route for the incoming stocks
+		// route for the adding incoming stocks
 		.when('/addincomingstock', {
 			templateUrl : 'pages/addincomingstock.html',
 			controller  : 'addIncomingStockController'
@@ -35,11 +35,16 @@ InventoryApp.config(function($routeProvider) {
             controller  : 'itemListController'
         })
 
+        .when('/incomingStockSummary', {
+            templateUrl : 'pages/incomingstocksSummary.html',
+            controller  : 'incomingStockSummaryController'
+        })
+
 		// route for the add_new_item page
 		.when('/newitem', {
             templateUrl : 'pages/newitem.html',
             controller  : 'newItemController'
-        });
+        });            
 });
 
 
@@ -80,19 +85,21 @@ InventoryApp.controller('addIncomingStockController', function($scope) {
 
 InventoryApp.controller('itemListController', function ($scope) {
     $scope.message = 'Item List';
-    
+    $scope.search = "";
     $.ajax({
         url: '/api/get_item_list',
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
+            $scope.$apply();
         },
         error: function (error) {
             $scope.message = 'Failed to get item list';
             angular.element('.container').css('background-color', '#FF0000');
-            $scope.$apply()
+            $scope.$apply();
         }
     });
+    
 });
 
 InventoryApp.controller('currentStockController', function ($scope) {
@@ -103,11 +110,12 @@ InventoryApp.controller('currentStockController', function ($scope) {
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
+            $scope.$apply();
         },
         error: function (error) {
             $scope.message = 'Failed to get current Stocks';
             angular.element('.container').css('background-color', '#FF0000');
-            $scope.$apply()
+            $scope.$apply();
         }
     });
 });
@@ -120,11 +128,12 @@ InventoryApp.controller('newItemController', function ($scope) {
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
+            $scope.$apply();
         },
         error: function (error) {
             $scope.message = 'Failed to get item list';
             angular.element('.container').css('background-color', '#FF0000');
-            $scope.$apply()
+            $scope.$apply();
         }
     });
     
@@ -161,4 +170,22 @@ InventoryApp.controller('newItemController', function ($scope) {
             }
         })
     };
+});
+
+InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {
+    $scope.message = 'Incoming Stocks Details';
+    // Use Ajax to submit form data
+    $.ajax({
+        url: '/api/get_incoming_stock?from=2015-01-01&to=2015-10-08&summary=true',
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get current Stocks';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
 });

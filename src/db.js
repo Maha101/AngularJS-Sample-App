@@ -322,21 +322,23 @@ function get_stock_details(obj, callback) {
                       "FROM incoming_stocks AS stocks\n" +
                       "JOIN items AS items\n" +
                       "ON items.item_id == stocks.item_id\n" +
-                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '2015-05-12') AND (items.name LIKE '%s')\n" +
+                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '%s') AND (items.name LIKE '%s')\n" +
                       "ORDER BY stocks.dt DESC",
                       obj.from,
                       obj.to,
                       obj.name);
+        INFO(stmt);
     } else {
-        stmt = format("SELECT items.name, SUM(stocks.quantity) as quantity, SUM(stocks.price) as price, stocks.dt\n" +
+        stmt = format("SELECT items.name, SUM(stocks.quantity) as quantity, SUM(stocks.price) as price\n" +
                       "FROM incoming_stocks AS stocks\n" +
                       "JOIN items AS items\n" +
                       "ON items.item_id == stocks.item_id\n" +
-                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '2015-05-12') AND (items.name LIKE '%s')\n" +
+                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '%s') AND (items.name LIKE '%s')\n" +
                       "group by items.name",
                       obj.from,
                       obj.to,
                       obj.name);
+        INFO(stmt);
     }
 
     db.execute_query(stmt, function(err, rows) {
