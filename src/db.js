@@ -353,6 +353,78 @@ function get_stock_details(obj, callback) {
     return;
 }
 
+// Format of obj
+//      from => Date from which details should be given.
+//      to   => Date to which details should be given. 
+//      Summary[default:true] => [true, false]. to give summary or individual transactions.[default true]
+//      name => name of the item for which the details should be given. If no
+//              name is provided the details are given for all the items.
+//
+
+function get_sales_details(obj, callback) {
+    var error_msg;
+    INFO("object %s", JSON.stringify(obj));
+    // Check the format of date and time.
+    if (typeof obj.from !== 'string' || typeof obj.to !== 'string') {
+        error_msg = format("obj.to and obj.from are in required format");
+    } else if (!moment(obj.to, "YYYY-MM-DD").isValid() || !moment(obj.from, "YYYY-MM-DD").isValid()) {
+        error_msg = format("to and from not in required format");
+    }
+    
+    if (typeof obj.name === 'undefined') {
+        obj.name = '%';
+    } else if (typeof obj.name !== 'string') {
+        error_msg = format("item_name '%s' is not string", name);
+    }
+    
+    if (typeof obj.summary === 'undefined') {
+        obj.summary = 'true';
+    } else if (!(obj.summary == 'true' || obj.summary == 'false')) {
+        error_msg = format("summary should be either 'true' or 'false'");
+    }
+    
+    // If the erorr_msg is set then print the error msg and return.
+    if (typeof error_msg === 'string') {
+        ERROR(error_msg);
+        process.nextTick(function () { callback(true, error_msg); return; });
+        return;
+    }
+    var stmt;
+    if (obj.summary == 'false') {
+         stmt = format("SELECT stocks.transaction_id, stocks.item_id, items.name, stocks.quantity, stocks.price, stocks.dt, stocks.transaction_type, stocks.reason\n" +
+                      "FROM outgoing_stocks AS stocks\n" +
+                      "JOIN items AS items\n" +
+                      "ON items.item_id == stocks.item_id\n" +
+                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '%s') AND (items.name LIKE '%s')\n" +
+                      "ORDER BY stocks.dt DESC",
+                      obj.from,
+                      obj.to,
+                      obj.name);
+    } else {
+        stmt = format("SELECT items.name, COUNT(items.name) as count, SUM(stocks.quantity) as quantity, SUM(stocks.price) as price\n" +
+                      "FROM outgoing_stocks AS stocks\n" +
+                      "JOIN items AS items\n" +
+                      "ON items.item_id == stocks.item_id\n" +
+                      "WHERE (stocks.dt >= '%s' AND stocks.dt <= '%s') AND (items.name LIKE '%s')\n" +
+                      "group by items.name",
+                      obj.from,
+                      obj.to,
+                      obj.name);
+    }
+    INFO(stmt);
+
+    db.execute_query(stmt, function (err, rows) {
+        if (err) {
+            ERROR("Getting sales details failed for obj '%s'", JSON.stringify(obj));
+            callback(true, err);
+            return;
+        }
+        callback(false, rows);
+        return;
+    });
+
+}
+
 module.exports = {
     open: db.open,
     status: db.status,
@@ -366,5 +438,7 @@ module.exports = {
     current_stocks: get_current_stocks,
 
     add_stock: add_incoming_stock,
-    get_stock_details:get_stock_details
+    get_stock_details: get_stock_details,
+
+    get_sales_details: get_sales_details
 };

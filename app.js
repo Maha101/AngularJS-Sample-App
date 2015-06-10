@@ -118,6 +118,38 @@ app.get('/api/get_incoming_stock', function (req, res) {
     });
 });
 
+app.get('/api/get_outgoing_stock', function (req, res) {
+    INFO("get_sales_details --> %s", req.query.name);
+    var obj = {};
+    if (typeof req.query.from === 'undefined' ||
+       typeof req.query.to === 'undefined') {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end("expected from and to parameters");
+    } else {
+        obj.from = req.query.from;
+        obj.to = req.query.to;
+    }
+    if (typeof req.query.name !== 'undefined') {
+        obj.name = req.query.name;
+    }
+    
+    if (typeof req.query.summary !== 'undefined') {
+        obj.summary = req.query.summary;
+    }
+    db.get_sales_details(obj, function (error, rows) {
+        if (error === true) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end(rows);
+            ERROR("cound not get sales details from db due to " + rows);
+            return;
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(rows));
+        }
+        return;
+    });
+});
+
 var eventEmitter = new events.EventEmitter();
 eventEmitter.setMaxListeners(1);
 

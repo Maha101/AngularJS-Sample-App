@@ -1,11 +1,11 @@
 ﻿<div class="container">
-    <h2>Incoming Stocks Details</h2>
+    <h2>{{message}}</h2>
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
     <div class="well" ng:controller="incomingStockTransaction">
         <form ng-submit="load_page()">
-            From <input type="text" id="from_date" ng-model="from"> &rarr;
-            To <input type="text" id="to_date" ng-model="to">&ensp;
+            From <input type="text" id="from_date" ng-model="from">
+            To <input type="text" id="to_date" ng-model="to">
             <input type="submit" value="submit" class="btn btn-primary" />
         </form>
         <br />
@@ -21,16 +21,16 @@
             <thead>
                 <tr>
                     <th> Trans Id  <font color="blue">[ Total: {{total_items()}} ] </font></th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
                             Item Name
                             <span ng-show="orderByField == 'name'">
                                 <span ng-show="!reverseSort">^</span>
                                 <span ng-show="reverseSort">v</span>
                             </span>
-                        </a> 
+                        </a>
                     </th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='quantity'; reverseSort = !reverseSort">
                             Quantity
                             <span ng-show="orderByField == 'quantity'">
@@ -40,7 +40,7 @@
                         </a>
                         <font color="blue">[ Total:{{total_quantity()}}]</font>
                     </th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='price'; reverseSort = !reverseSort">
                             Price
                             <span ng-show="orderByField == 'price'">
@@ -50,7 +50,33 @@
                         </a>
                         <font color="blue"> [ Total: {{total_price()}} ]</font>
                     </th>
-                    <th> date      </th>
+                    <th>
+                        <a href="" ng-click="orderByField='dt'; reverseSort = !reverseSort">
+                            Date
+                            <span ng-show="orderByField == 'dt'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="orderByField='transaction_type'; reverseSort = !reverseSort">
+                            Transaction Type
+                            <span ng-show="orderByField == 'transaction_type'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="orderByField='reason'; reverseSort = !reverseSort">
+                            Reason
+                            <span ng-show="orderByField == 'reason'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -60,18 +86,20 @@
                     <td>{{(row.quantity/1000).toFixed(3)}}</td>
                     <td>{{row.price}}</td>
                     <td>{{row.dt}}</td>
+                    <td>{{row.transaction_type}}</td>
+                    <td>{{row.reason}}</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <script>
         function incomingStockTransaction($scope) {
-            $scope.load_page = function () {                
+            $scope.load_page = function () {
             $.ajax({
-                url: '/api/get_incoming_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
+                url: '/api/get_outgoing_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
                 type: 'GET',
                 success: function (result) {
-                    $scope.item_list = result;
+                    $scope.item_list = result;                    
                     angular.element('.container').css('background-color', '#FFFFFF');
                     $scope.$apply();
                 },

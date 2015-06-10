@@ -44,6 +44,15 @@ InventoryApp.config(function($routeProvider) {
             templateUrl : 'pages/incomingstocksTransaction.html',
             controller  : 'incomingStockTransactionController'
         })
+        .when('/salesSummary', {
+            templateUrl : 'pages/salesSummary.html',
+            controller  : 'salesSummaryController'
+        })
+
+        .when('/salesTransaction', {
+            templateUrl : 'pages/salesTransaction.html',
+            controller  : 'salesTransactionController'
+        })
 		// route for the add_new_item page
 		.when('/newitem', {
             templateUrl : 'pages/newitem.html',
@@ -183,9 +192,9 @@ InventoryApp.controller('newItemController', function ($scope) {
 });
 
 InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {    
-    $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
-    $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
-    $scope.message = 'Incoming Stocks Summary from ' + $scope.from + " to " + $scope.to;
+    $scope.from = typeof $routeParams.from === 'undefined' ?  moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
+    $scope.message = 'Incoming Stocks Summary';
     
     $scope.orderByField = 'name';
     $scope.reverseSort = false;
@@ -207,16 +216,16 @@ InventoryApp.controller('incomingStockSummaryController', function ($scope, $rou
 });
 
 InventoryApp.controller('incomingStockTransactionController', function ($scope, $routeParams) {    
-    $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
-    $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
-    $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
+    $scope.from = typeof $routeParams.from === 'undefined' ? moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
+    $scope.message = 'Incoming Stocks Details';
     
     $scope.orderByField = 'dt';
     $scope.reverseSort = false;
 
     // Use Ajax to get data
     $.ajax({
-        url: '/api/get_incoming_stock?summary=false&from=' + $routeParams.from + "&to=" + $routeParams.to,
+        url: '/api/get_incoming_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
@@ -224,6 +233,54 @@ InventoryApp.controller('incomingStockTransactionController', function ($scope, 
         },
         error: function (error) {
             $scope.message = 'Failed to get incoming Stock';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+});
+
+InventoryApp.controller('salesSummaryController', function ($scope, $routeParams) {
+    $scope.from = typeof $routeParams.from === 'undefined' ?  moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
+    $scope.message = 'Sales Summary';
+    
+    $scope.orderByField = 'name';
+    $scope.reverseSort = false;
+    
+    // Use Ajax to get data
+    $.ajax({
+        url: '/api/get_incoming_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get Incoming Stock Summary';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+});
+
+InventoryApp.controller('salesTransactionController', function ($scope, $routeParams) {
+    $scope.from = typeof $routeParams.from === 'undefined' ? moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
+    $scope.message = 'Sales Transaction Details';
+    
+    $scope.orderByField = 'dt';
+    $scope.reverseSort = false;
+    
+    // Use Ajax to get data
+    $.ajax({
+        url: '/api/get_outgoing_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get outgoing Stock';
             angular.element('.container').css('background-color', '#FF0000');
             $scope.$apply()
         }

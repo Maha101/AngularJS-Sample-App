@@ -3,7 +3,7 @@
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
 
-    <div class="well" ng:controller="incomingStockSummary">
+    <div class="well" ng:controller="outgoingStockSummary">
         <form ng-submit="load_page()">
             <style>
                 input[type=date] {
@@ -12,9 +12,9 @@
                     width: 100px;
                 }
             </style>
-            From <input type="text" id="from_date" ng-model="from" >
-            To <input type="text" id="to_date" ng-model="to" >                   
-            <input type="submit" value="submit" class="btn btn-primary" />            
+            From <input type="text" id="from_date" ng-model="from">
+            To <input type="text" id="to_date" ng-model="to">
+            <input type="submit" value="submit" class="btn btn-primary" />
 
         </form>
 
@@ -31,7 +31,7 @@
             <thead>
                 <tr>
                     <th> Index <font color="blue">[ Total: {{total_items()}} ] </font></th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
                             Item Name
                             <span ng-show="orderByField == 'name'">
@@ -40,16 +40,16 @@
                             </span>
                         </a>
                     </th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='count'; reverseSort = !reverseSort">
                             Count
                             <span ng-show="orderByField == 'count'">
                                 <span ng-show="!reverseSort">^</span>
                                 <span ng-show="reverseSort">v</span>
                             </span>
-                       </a>
+                        </a>
                     </th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='quantity'; reverseSort = !reverseSort">
                             Quantity
                             <span ng-show="orderByField == 'quantity'">
@@ -59,7 +59,7 @@
                         </a>
                         <font color="blue">[ Total: {{total_quantity()}} ] </font>
                     </th>
-                    <th> 
+                    <th>
                         <a href="" ng-click="orderByField='price'; reverseSort = !reverseSort">
                             Price
                             <span ng-show="orderByField == 'price'">
@@ -83,13 +83,13 @@
         </table>
     </div>
     <script>
-        function incomingStockSummary($scope) {
-            $scope.load_page = function () {                
+        function outgoingStockSummary($scope) {
+            $scope.load_page = function () {
                 $.ajax({
-                    url: '/api/get_incoming_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
+                    url: '/api/get_outgoing_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
                     type: 'GET',
                     success: function (result) {
-                        $scope.item_list = result;                        
+                        $scope.item_list = result;
                         angular.element('.container').css('background-color', '#FFFFFF');
                         $scope.$apply();
                     },
@@ -105,10 +105,10 @@
                 angular.forEach($scope.filtered_item_list, function (item) {
                     total += item.quantity;
                 })
-                return (total/1000).toFixed(3) + "Kg";
+                return (total / 1000).toFixed(3) + "Kg";
             }
 
-            $scope.total_price = function (){
+            $scope.total_price = function () {
                 var total = 0;
                 angular.forEach($scope.filtered_item_list, function (item) {
                     total += item.price;
@@ -116,14 +116,14 @@
                 return total;
             }
 
-            $scope.total_items = function () {                
+            $scope.total_items = function () {
                 return $scope.filtered_item_list.length;
-            }            
+            }
 
             $('#from_date').datepicker({
                 format: "yyyy-mm-dd"
             });
-            
+
             $('#to_date').datepicker({
                 format: "yyyy-mm-dd"
             });
