@@ -27,12 +27,12 @@
                         </td>
                         <td>
                             Quantity
-                            <input type="number" ng:model="item.qty" ng:required step=".001" min=".01" tabindex="2" max="{{config.max_qty}}" placeholder="Enter Qunatity"><br />
+                            <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="2" max="{{config.max_qty}}" placeholder="Enter Qunatity"><br />
                             <span>{{qty_to_string(item.qty)}}</span>
                         </td>
                         <td>
                             Price Paid
-                            <input type="number" ng:model="item.cost" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost">
+                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost">
                         </td>
                         <td>
                             <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="4" />
@@ -43,7 +43,7 @@
                     </tr>
                 </table>
             </form>    
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered ">
                 <tr>
                     <th>Index <font color="blue"> [ Total: {{invoice.items.length}} ]</font></th>
                     <th>Item Name <font color="red"> {{repeated_items()}}</font></th>
@@ -57,11 +57,11 @@
                        <span> {{item.name}}</span>
                     </td>
                     <td>
-                        <span> {{qty_to_string(item.qty)}}</span>
+                        <span> {{qty_to_string(item.quantity)}}</span>
                     </td>
 
                     <td>                        
-                        <span> {{item.cost}}</span>
+                        <span> {{item.price}}</span>
                     </td>
                     <td>
                         <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
@@ -78,23 +78,23 @@
                 $scope.addItem = function () {
                     // verify the input paramters
                     if(typeof $scope.item.name !== 'string' ||
-                       typeof $scope.item.qty !== 'number'  ||
-                       typeof $scope.item.cost !== 'number' ||
+                       typeof $scope.item.quantity !== 'number' ||
+                       typeof $scope.item.price !== 'number' ||
                        $scope.item.name == -1 ||
-                       $scope.item.qty < 0.01 || $scope.item.qty > $scope.config.max_qty ||
-                       $scope.item.cost < 1   || $scope.item.cost > $scope.config.max_price)
+                       $scope.item.quantity < 0.01 || $scope.item.quantity > $scope.config.max_qty ||
+                       $scope.item.price < 1   || $scope.item.price > $scope.config.max_price)
                     {
                         sweetAlert("Verify the name, quantity and cost again", "", "error");
                         return;
                     }
                     $scope.invoice.items.unshift({
-                        qty: $scope.item.qty,
+                        quantity: $scope.item.quantity,
                         name: $scope.item.name,
-                        cost: $scope.item.cost
+                        price: $scope.item.price
                     });
-                    $scope.item.qty = 0;
+                    $scope.item.quantity = 0;
                     $scope.item.name = -1;
-                    $scope.item.cost = 0;                    
+                    $scope.item.price = 0;                    
                 }
 
                 $scope.removeItem = function (index) {
@@ -104,7 +104,7 @@
                 $scope.total_cost = function () {
                     var total = 0;
                     angular.forEach($scope.invoice.items, function (item) {
-                        total += item.cost;
+                        total += item.price;
                     });
                     return total;
                 }
@@ -117,6 +117,7 @@
                     
                     var kg = Math.floor(total);
                     var gm = ((total - kg) * 1000).toFixed(0);
+
                     if (kg == 0) {
                         return "" + gm + "gm";
                     } else if (gm == 0) {
@@ -128,7 +129,7 @@
                 $scope.total_weight = function () {
                     var total = 0;
                     angular.forEach($scope.invoice.items, function (item) {
-                        total += item.qty;
+                        total += item.quantity;
                     });
                     return $scope.qty_to_string(total);                    
                 }
@@ -157,16 +158,28 @@
                 $scope.submitStock = function () {                    
                     var total_qty = 0, total_cost = 0;
                     angular.forEach($scope.invoice.items, function (item) {
-                        total_qty += item.qty;
-                        total_cost += item.cost;
+                        total_qty += item.quantity;
+                        total_cost += item.price;
+                        item.name = item.name + "1";
                     });
-                    var list = repeated_items();
+                    var list = $scope.repeated_items();
                     if (list !== "") {
                         sweetAlert(list, "", "error");
                         return;
-                    } else {
-                        sweetAlert("Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost, "");
                     }
+                    sweetAlert("Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost, "", "info");                    
+                    $.ajax({
+                        url: '/api/add_stock',
+                        type: 'post',
+                        contentType: "application/json",
+                        data: JSON.stringify($scope.invoice.items),
+                        success: function (result, textStatus) {
+                            alert("Added Stocks to database");
+                        },
+                        error: function (error, textStatus) {                                
+                            sweetAlert("Failed to insert items [" + error.responseText + "]", "", "error");
+                        }
+                    });
                 }
             }
         </script>

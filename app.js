@@ -1,16 +1,17 @@
 ﻿var app = require('express')(),
     http = require('http').Server(app),
-    os = require('os'),
-    url = require('url'),
-    db  = require('./src/db');
-    util = require('util'),
-    debug = require('debug');
+    bodyParser = require('body-parser');
+        
+var db = require('./src/db');
+
+var debug = require('debug'),
+    events = require('events');
 
 var INFO  = debug('APP:INFO');
 var ERROR = debug('APP:ERR');
 var WARN  = debug('APP:WARN');
 
-var hostname = os.hostname(), port = 80, server;
+var hostname = require('os').hostname(), port = 80, server;
 
 var db_path = '../db/goldennuts.db';
 db.open(db_path, false);
@@ -18,6 +19,11 @@ if(db.status() == false) {
     ERROR("unable to open DB");
     process.exit(1);
 }
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({     
+    extended: true
+}));
 
 app.get('/', function (req, res) {
     //console.log("username: %s", req.user);
@@ -112,26 +118,42 @@ app.get('/api/get_incoming_stock', function (req, res) {
     });
 });
 
-app.get('/api/add_stock', function (req, res) {
+var eventEmitter = new events.EventEmitter();
+eventEmitter.setMaxListeners(1);
+
+app.post('/api/add_stock', function (req, res) {
     var obj = {};
-    INFO("add stock %d gm of %s at Rs %d", req.query.quantity, req.query.name, req.query.price);
-    
-    obj.name = req.query.name;
-    obj.quantity = req.query.quantity;
-    obj.price = req.query.price;
-    db_logic.new_stock(obj, function (error, msg) {
-        if (error === true) {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end(msg);
-            ERROR(msg);
-            return;
+    INFO("%s", JSON.stringify(req.body));
+    var failed_list = "";
+    var obj = req.body;
+    var count = -1;
+    eventEmitter.on('next_item', function () {
+        count++;
+        if (count < obj.length) {
+            obj[count].quantity *= 1000;
+            INFO("Inserting Stock %s -> Q: %d -> P: %d", obj[count].name, obj[count].quantity, obj[count].price);
+            db.add_stock(obj[count], function (error, msg) {
+                if (error === true) {
+                    failed_list = failed_list + (failed_list == "" ?  "" : ",") + obj[count].name;
+                }
+                eventEmitter.emit("next_item");
+                return;
+            });
         } else {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end(msg);
-            INFO("added " + obj.quantity + " of " + req.query.name + " to DB.");
+            eventEmitter.removeAllListeners('next_item');
+
+            if (failed_list == "") {
+                INFO("inserted all the elemented to DB");
+                res.writeHead(200, "OK", { 'Content-Type': 'text/plain' });
+                res.end("kiran");
+            } else {
+                ERROR("Failed to insert items : %s", failed_list);
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end(failed_list);                
+            }
         }
-        return;
     });
+    eventEmitter.emit("next_item");    
 });
 
 
