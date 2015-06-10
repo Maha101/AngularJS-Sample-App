@@ -112,6 +112,8 @@ InventoryApp.controller('itemListController', function ($scope) {
 
 InventoryApp.controller('currentStockController', function ($scope) {
     $scope.message = 'Current Stocks';
+    $scope.orderByField = 'quantity';
+    $scope.reverseSort = false;
     // Use Ajax to submit form data
     $.ajax({
         url: '/api/current_stocks',
@@ -180,12 +182,15 @@ InventoryApp.controller('newItemController', function ($scope) {
     };
 });
 
-InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {
-    
+InventoryApp.controller('incomingStockSummaryController', function ($scope, $routeParams) {    
     $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
     $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
     $scope.message = 'Incoming Stocks Summary from ' + $scope.from + " to " + $scope.to;
-    // Use Ajax to submit form data
+    
+    $scope.orderByField = 'name';
+    $scope.reverseSort = false;
+
+    // Use Ajax to get data
     $.ajax({
         url: '/api/get_incoming_stock?summary=true&from='+$scope.from+"&to="+$scope.to,
         type: 'GET',        
@@ -204,9 +209,12 @@ InventoryApp.controller('incomingStockSummaryController', function ($scope, $rou
 InventoryApp.controller('incomingStockTransactionController', function ($scope, $routeParams) {    
     $scope.from = typeof $routeParams.from === 'undefined' ? '2015-05-01' : $routeParams.from;
     $scope.to = typeof $routeParams.to === 'undefined' ? '2020-05-01' : $routeParams.to;
-
     $scope.message = 'Incoming Stocks Details from ' + $scope.from + " to " + $scope.to;
-    // Use Ajax to submit form data
+    
+    $scope.orderByField = 'dt';
+    $scope.reverseSort = false;
+
+    // Use Ajax to get data
     $.ajax({
         url: '/api/get_incoming_stock?summary=false&from=' + $routeParams.from + "&to=" + $routeParams.to,
         type: 'GET',        

@@ -16,12 +16,28 @@
             <thead>
                 <tr>
                     <th>Item ID</th>
-                    <th>Item Name</th>
-                    <th>Quantity </th>
+                    <th>
+                        <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
+                            Item Name
+                            <span ng-show="orderByField == 'name'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a> 
+                    </th>
+                    <th> 
+                        <a href="" ng-click="orderByField='quantity'; reverseSort = !reverseSort">
+                            Quantity
+                            <span ng-show="orderByField == 'quantity'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="item in item_list | filter:search | orderBy:'quantity'" 
+                <tr ng-repeat="item in item_list | filter:search | orderBy:orderByField:reverseSort"
                     ng-style="{'color': (item.quantity < 1000 ? 'red' : (item.quantity < 3000 ? 'blue' : 'black'))}">
                     <td>{{ item.item_id }}</td>
                     <td>{{ item.name }}</td>

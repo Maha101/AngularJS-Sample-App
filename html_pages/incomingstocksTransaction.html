@@ -12,7 +12,7 @@
         <form>
             <div class="form-group">
                 <div class="input-group">
-                    <div class="input-group-addon"><i class="fa fa-search"></i></div>
+                    <div class="input-group-addon">S</div>
                     <input type="text" class="form-control" placeholder="" ng-model="search" />
                 </div>
             </div>
@@ -21,18 +21,44 @@
             <thead>
                 <tr>
                     <th> Trans Id  <font color="blue">[ Total: {{total_items()}} ] </font></th>
-                    <th> Item Name </th>
-                    <th> quantity  <font color="blue">[ Total: {{total_quantity()}} ] </font></th>
-                    <th> price     <font color="blue"> [ Total: {{total_price()}} ]</font></th>
+                    <th> 
+                        <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
+                            Item Name
+                            <span ng-show="orderByField == 'name'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a> 
+                    </th>
+                    <th> 
+                        <a href="" ng-click="orderByField='quantity'; reverseSort = !reverseSort">
+                            Quantity
+                            <span ng-show="orderByField == 'quantity'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                        <font color="blue">[ Total:{{total_quantity()}}]</font>
+                    </th>
+                    <th> 
+                        <a href="" ng-click="orderByField='price'; reverseSort = !reverseSort">
+                            Price
+                            <span ng-show="orderByField == 'price'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                        <font color="blue"> [ Total: {{total_price()}} ]</font>
+                    </th>
                     <th> date      </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:'dt'">
-                    <td>{{row.transaction_id}}</td>                    
+                <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:orderByField:reverseSort">
+                    <td>{{row.transaction_id}}</td>
                     <td>{{row.name}}</td>
                     <td>{{(row.quantity/1000).toFixed(3)}}</td>
-                    <td>{{row.price}}</td>                    
+                    <td>{{row.price}}</td>
                     <td>{{row.dt}}</td>
                 </tr>
             </tbody>
