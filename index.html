@@ -6,10 +6,12 @@
 <head>    
     <title>The Golden Nuts</title>
     <!--Boot Straps Scripts -->
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
+            
     <link rel="stylesheet" href="/scripts/bootstrap.min.css" />
+    <link rel="stylesheet" href="/scripts/bootstrap-datepicker.min.css" />
     <script src="/scripts/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
+    <script src="/scripts/bootstrap-datepicker.min.js"></script>
 
     <!-- Angular JS scripts -->
     <script src="/scripts/angular.min.js"></script>
@@ -28,31 +30,39 @@
 
     <nav class="navbar navbar-default navbar-static-top" role="navigation">
         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             <a class="navbar-brand" href="/">The Golden Nuts Inventory Management</a>
         </div>
-        <div>
+        <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="#currentstock"><i class="fa fa-home"></i> Current Stocks </a></li>                
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-book fa-fw"></i> Reports <span class="caret"></span></a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="">Reports <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Daily Report </a></li> 
-                        <li><a href="#itemlist">Item List</a></li> 
+                        <li><a href="#">Daily Report </a></li>
+                        <li><a href="#itemlist">Item List</a></li>
+                        <li><a href="#currentstock">Current Stocks </a></li>
                         <li class="divider"></li>
-                        <li><a href="#">Sales</a></li>
-                        <li><a href="#">Incoming Stocks</a></li>
+                        <li><a href="#">Outgoing Stocks Summary</a></li>
+                        <li><a href="#">Outoging Stocks Transaction</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#incomingStockSummary">Incoming Stocks Summary</a></li>
+                        <li><a href="#incomingStockTransaction?from=2015-01-01&to=2020-12-31">Incoming Stocks Transaction</a></li>
+                        <li class="divider"></li>
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" ><i class="fa fa-pencil fa-fw"></i> Action <span class="caret"></span></a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="">Action <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="#newitem">Add New Item</a></li>
                         <li><a href="#">Add Sale</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#incomingstock">Add Incoming Stock</a></li>                                               
+                        <li><a href="#addincomingstock">Add Incoming Stock</a></li>
                     </ul>
                 </li>
-                <li><a href="#about?userName=kiran"> About </a></li> 
+                <li><a href="#about?userName=kiran"> About </a></li>
                 <li><p>&nbsp;&nbsp;&nbsp;</p></li>
             </ul>
         </div>

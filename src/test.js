@@ -145,7 +145,7 @@ function add_stocks_to_db() {
     ];
 
     function add_stock_and_check(obj) {
-        db.new_stock(obj, function(err, msg) {
+        db.add_stock(obj, function(err, msg) {
             assert(err != obj.err, obj.msg + "\n" + JSON.stringify(obj)); 
             eventEmitter.emit("add_stock");
             return;

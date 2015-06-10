@@ -3,13 +3,17 @@
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
     <div class="well">
         <form name="itemForm" ng-submit="submitForm()" novalidate>
-
-            <!-- NAME -->
+            
             <div class="form-group" ng-class="{ 'has-error' : itemForm.name.$invalid && !itemForm.name.$pristine }">
                 <label>Item Name</label>
                 <input type="text" name="name" class="form-control"
-                       ng-model="item.name" ng-minlength="3" ng-pattern="itemNamePattern"
+                       ng-model="item.name" ng-minlength="3" ng-pattern="itemNamePattern" list="item_names"
                        required>
+                <datalist id="item_names">
+                    <select>
+                        <option ng-repeat="item in item_list" value="{{item.name}}"></option>
+                    </select>
+                </datalist>
                 <p ng-show="itemForm.name.$invalid && !itemForm.name.$pristine" class="help-block">
                     Check the name correctly. Only Letter, numbers, '-', '_' are allowed.
                 </p>

@@ -1,0 +1,51 @@
+<div class="container">
+    <h2>{{message}}</h2>
+  
+    <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
+    <div class="well">
+
+        <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-search"></i></div>
+                    <input type="text" class="form-control" placeholder="" ng-model="search" />
+                </div>
+            </div>
+        </form>
+        <table class="table table-striped table-bordered ">            
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>
+                        <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
+                            Item Name
+                            <span ng-show="orderByField == 'name'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a> 
+                    </th>
+                    <th> 
+                        <a href="" ng-click="orderByField='quantity'; reverseSort = !reverseSort">
+                            Quantity
+                            <span ng-show="orderByField == 'quantity'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in item_list | filter:search | orderBy:orderByField:reverseSort"
+                    ng-style="{'color': (item.quantity < 1000 ? 'red' : (item.quantity < 3000 ? 'blue' : 'black'))}">
+                    <td>{{ item.item_id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>
+                        {{ (item.quantity/1000).toFixed(3) }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
