@@ -31,11 +31,11 @@ app.get('/', function (req, res) {
 });
 
 app.get('/pages/*', function(req, res) {
-    res.sendFile(__dirname + '/pages/' + req.params[0]);
+    res.sendFile(__dirname + '/html_pages/' + req.params[0]);
 });
 
-app.get('/scripts/*', function(req, res) {
-    res.sendFile(__dirname + '/scripts/' + req.params[0]);
+app.get('/scripts/*', function (req, res) {    
+    res.sendFile(__dirname + '/downloaded_scripts/' + req.params[0]);
 });
 
 app.get('/api/get_item_list', function (req, res) {

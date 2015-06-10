@@ -13,37 +13,41 @@
             }
         </style>        
         <div ng:controller="InputForm">
-            <form name="incomingItems" ng-submit="submitStock()" >
-                <table class="table table-striped table-bordered table-condensed">
+            <form name="incomingItems">
+                <table class="table table-striped table-bordered">
                     <tr>
                         <td>
-                            Item
+                            <b>Item</b>
                             <select id="sel" class="input-block-level" ng-model="item.name"
-                                    ng:change='selectedItem(name)' tabindex="1" autofocus>
+                                    ng:change='selectedItem(name)' tabindex="1" autofocus style="width:100%">
                                 <option ng-repeat="item in item_list" value="{{item.name}}">
                                     {{item.name}}
                                 </option>
                             </select>
                         </td>
                         <td>
-                            Quantity
-                            <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="2" max="{{config.max_qty}}" placeholder="Enter Qunatity"><br />
-                            <span>{{qty_to_string(item.qty)}}</span>
+                            <b>Quantity</b>
+                            <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="2" 
+                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" style="width:100%">
+                            <br />
+                            <span>{{qty_to_string(item.quantity)}}</span>
                         </td>
                         <td>
-                            Price Paid
-                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost">
+                            <b>Cost</b>
+                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost" style="width:100%">
                         </td>
                         <td>
-                            <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="4" />
+                            <br />
+                            <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="4" style="width:100%" />
                         </td>
                         <td>
-                            <input type="submit" value="Submit" class="btn btn-primary" />
+                            <br />
+                            <input type="button" value="Submit Items" class="btn btn-primary" ng-click="submitStock()" tabindex="5"  style="width:100%" />
                         </td>
                     </tr>
                 </table>
             </form>    
-            <table class="table table-striped table-bordered ">
+            <table class="table table-striped table-bordered">
                 <tr>
                     <th>Index <font color="blue"> [ Total: {{invoice.items.length}} ]</font></th>
                     <th>Item Name <font color="red"> {{repeated_items()}}</font></th>
@@ -157,28 +161,48 @@
 
                 $scope.submitStock = function () {                    
                     var total_qty = 0, total_cost = 0;
+                    if ($scope.invoice.items.length == 0) {
+                        return;
+                    }
                     angular.forEach($scope.invoice.items, function (item) {
                         total_qty += item.quantity;
-                        total_cost += item.price;
-                        item.name = item.name + "1";
+                        total_cost += item.price;                        
                     });
+
+                    // Check if any item is repeated twice. If yes don't proceed further.
                     var list = $scope.repeated_items();
                     if (list !== "") {
                         sweetAlert(list, "", "error");
                         return;
                     }
-                    sweetAlert("Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost, "", "info");                    
-                    $.ajax({
-                        url: '/api/add_stock',
-                        type: 'post',
-                        contentType: "application/json",
-                        data: JSON.stringify($scope.invoice.items),
-                        success: function (result, textStatus) {
-                            alert("Added Stocks to database");
-                        },
-                        error: function (error, textStatus) {                                
-                            sweetAlert("Failed to insert items [" + error.responseText + "]", "", "error");
+            
+                    swal({
+                        title: "Add Stocks to database",
+                        text: "Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, Add it!",
+                        cancelButtonText: "No, cancel!",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $.ajax({
+                                url: '/api/add_stock',
+                                type: 'post',
+                                contentType: "application/json",
+                                data: JSON.stringify($scope.invoice.items),
+                                success: function (result, textStatus) {                                    
+                                    swal("Added!", "All the items have been added to Database", "success");
+                                },
+                                error: function (error, textStatus) {
+                                    swal("Failed to insert " + error.responseText + " to Database", "", "error");
+                                }
+                            });
                         }
+                        return;
                     });
                 }
             }
