@@ -32,6 +32,7 @@
                 <tr>
                     <th> Index <font color="blue">[ Total: {{total_items()}} ] </font></th>
                     <th> Name </th>
+                    <th> Count </th>
                     <th> Quantity <font color="blue">[ Total: {{total_quantity()}} ] </font></th>
                     <th> Price <font color="blue"> [ Total: {{total_price()}} ]</font></th>
                 </tr>
@@ -40,6 +41,7 @@
                 <tr ng-repeat="row in filtered_item_list = (item_list | filter:search) | orderBy:'dt'">
                     <td>{{$index+1}}</td>
                     <td>{{row.name}}</td>
+                    <td>{{row.count}}</td>
                     <td>{{(row.quantity/1000).toFixed(3)}}</td>
                     <td>{{row.price}}</td>
                 </tr>

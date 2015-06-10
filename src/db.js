@@ -329,7 +329,7 @@ function get_stock_details(obj, callback) {
                       obj.name);
         INFO(stmt);
     } else {
-        stmt = format("SELECT items.name, SUM(stocks.quantity) as quantity, SUM(stocks.price) as price\n" +
+        stmt = format("SELECT items.name, COUNT(items.name) as count, SUM(stocks.quantity) as quantity, SUM(stocks.price) as price\n" +
                       "FROM incoming_stocks AS stocks\n" +
                       "JOIN items AS items\n" +
                       "ON items.item_id == stocks.item_id\n" +
