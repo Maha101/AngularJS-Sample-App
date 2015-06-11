@@ -28,59 +28,60 @@
 
 <!-- define angular controller -->
 <body ng-controller="mainController">
-
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">The Golden Nuts Inventory Management</a>
-        </div>
-        <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="">Reports <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Daily Report </a></li>
-                        <li><a href="#itemlist">Item List</a></li>
-                        <li><a href="#currentstock">Current Stocks </a></li>
-                        <li class="divider"></li>
-                        <li><a href="#salesSummary">Outgoing Stocks Summary</a></li>
-                        <li><a href="#salesTransaction">Outoging Stocks Transaction</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#incomingStockSummary">Incoming Stocks Summary</a></li>
-                        <li><a href="#incomingStockTransaction">Incoming Stocks Transaction</a></li>
-                        <li class="divider"></li>
+    <div class="container">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">The Golden Nuts Inventory Management</a>
+                </div>
+                <div class="collapse navbar-collapse collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="">Reports <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Daily Report </a></li>
+                                <li><a href="#itemlist">Item List</a></li>
+                                <li><a href="#currentstock">Current Stocks </a></li>
+                                <li class="divider"></li>
+                                <li><a href="#salesSummary">Outgoing Stocks Summary</a></li>
+                                <li><a href="#salesTransaction">Outoging Stocks Transaction</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#incomingStockSummary">Incoming Stocks Summary</a></li>
+                                <li><a href="#incomingStockTransaction">Incoming Stocks Transaction</a></li>
+                                <li class="divider"></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="">Action <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#newitem">Add New Item</a></li>
+                                <li><a href="#">Add Sale</a></li>
+                                <li><a href="#addincomingstock">Add Incoming Stock</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#about?userName=kiran"> About </a></li>
+                        <li><p>&nbsp;&nbsp;&nbsp;</p></li>
                     </ul>
-                </li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="">Action <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#newitem">Add New Item</a></li>
-                        <li><a href="#">Add Sale</a></li>
-                        <li><a href="#addincomingstock">Add Incoming Stock</a></li>
-                    </ul>
-                </li>
-                <li><a href="#about?userName=kiran"> About </a></li>
-                <li><p>&nbsp;&nbsp;&nbsp;</p></li>
-            </ul>
-        </div>
-    </nav>
+                </div>
+            </div>
+        </nav>
 
-  <div id="main">
-  
-    <!-- angular templating -->		
-    <div ng-view></div>
-    
-  </div>
-  
-  <footer class="text-center">
-    <p>View the tutorial on <a href="http://scotch.io/tutorials/javascript/single-page-apps-with-angularjs-routing-and-templating">Scotch.io</a></p>
-  
-    <p>View a tutorial on <a href="http://scotch.io/tutorials/javascript/animating-angularjs-apps-ngview">Animating Your Angular Single Page App</a></p>
-  </footer>
+
+        <div id="main">
+
+            <!-- angular templating -->
+            <div ng-view></div>
+
+        </div>
+    </div>
+    <footer class="text-center">
+    <p><b><font color="Black">The Golden Nuts Inventory Management</font></b></p>
+    </footer>
   
 </body>
 

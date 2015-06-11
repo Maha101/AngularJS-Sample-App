@@ -1,6 +1,22 @@
 // create the module and name it InventoryApp
 var InventoryApp = angular.module('InventoryApp', ['ngRoute']);
 
+InventoryApp.run(function ($window, $rootScope) {
+    $rootScope.online = navigator.onLine;
+    $window.addEventListener("offline", function () {
+        $rootScope.$apply(function () {
+            $rootScope.online = false;
+            alert("offline");
+        });
+    }, false);
+    $window.addEventListener("online", function () {
+        $rootScope.$apply(function () {
+            $rootScope.online = true;
+            alert("online");
+        });
+    }, false);
+});
+
 // configure our routes
 InventoryApp.config(function($routeProvider) {
 	$routeProvider
@@ -274,7 +290,8 @@ InventoryApp.controller('salesTransactionController', function ($scope, $routePa
     // Use Ajax to get data
     $.ajax({
         url: '/api/get_outgoing_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
-        type: 'GET',        
+        type: 'GET',
+        timeout: 8000,        
         success: function (result) {
             $scope.item_list = result;
             $scope.$apply();

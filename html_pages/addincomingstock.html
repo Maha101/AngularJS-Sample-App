@@ -18,7 +18,7 @@
                     <tr>
                         <td>
                             <b>Item</b>
-                            <select id="sel" class="input-block-level" ng-model="item.name"
+                            <select id="selectItem" class="input-block-level" ng-model="item.name"
                                     ng:change='selectedItem(name)' tabindex="1" autofocus style="width:100%">
                                 <option ng-repeat="item in item_list" value="{{item.name}}">
                                     {{item.name}}
@@ -78,8 +78,10 @@
                 $scope.invoice = {
                     items: [],
                 };               
-
+                document.getElementById("selectItem").focus();
+                    
                 $scope.addItem = function () {
+                    document.getElementById("selectItem").focus();
                     // verify the input paramters
                     if(typeof $scope.item.name !== 'string' ||
                        typeof $scope.item.quantity !== 'number' ||
