@@ -325,8 +325,13 @@ InventoryApp.controller('outgoingStockController', function ($scope) {
     
     $scope.message = 'Add Outgoing Stock to Database';
     $scope.config = {
-        max_qty: 250,
-        max_price: 75000
+        max_price: 175000,
+        max_qty: 0
+    }
+    $scope.bill = {
+        bill: 0,
+        reason: 0,
+        comment: 0
     }
     $.ajax({
         url: '/api/current_stocks',

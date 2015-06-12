@@ -28,30 +28,29 @@
                                 <option>Distributor</option>
                                 <option>Local Sale</option>
                                 <option>Gift</option>
+                                <option>Wastage</option>
                                 <option>Others</option>
                             </select>
                         </td>
                         <td>
                             <b>Comment</b>
-                            <input type="text" ng:model="bill.comment" stabindex="3" placeholder="Comment" style="width:100%">
+                            <input type="text" ng:model="bill.comment" tabindex="3" placeholder="Comment" style="width:100%">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <b>Item</b>
+                            <b>Item </b><font color="green">{{config.max_qty == 0 ? "" : ("available " + config.max_qty + " KG")}}</font>
                             <select id="selectItem" class="input-block-level" ng-model="item.name"
-                                    ng:change='selectedItem(name)' autofocus style="width:100%" tabindex="4">
+                                    ng:change='selectedItem(item.name)' autofocus style="width:100%" tabindex="4">
                                 <option ng-repeat="item in current_stocks" value="{{item.name}}">
                                     {{item.name}}
                                 </option>
                             </select>
                         </td>
                         <td>
-                            <b>Quantity</b>
+                            <b>Quantity </b><font color="green">{{qty_to_string(item.quantity)}}</font>
                             <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="5"
-                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" style="width:100%">
-                            <br />
-                            <span>{{qty_to_string(item.quantity)}}</span>
+                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" style="width:100%">                            
                         </td>
                         <td>
                             <b>Cost</b>
@@ -103,14 +102,15 @@
                 document.getElementById("billno").focus();
 
                 $scope.addItem = function () {
+
                     document.getElementById("selectItem").focus();
                     // verify the input paramters
                     if(typeof $scope.item.name !== 'string' ||
                        typeof $scope.item.quantity !== 'number' ||
                        typeof $scope.item.price !== 'number' ||
                        $scope.item.name == -1 ||
-                       $scope.item.quantity < 0.01 || $scope.item.quantity > $scope.config.max_qty ||
-                       $scope.item.price < 1   || $scope.item.price > $scope.config.max_price)
+                       ($scope.item.quantity) < 0.01 || ($scope.item.quantity > $scope.config.max_qty) ||
+                       ($scope.item.price < 1)   || ($scope.item.price > $scope.config.max_price))
                     {
                         sweetAlert("Verify the name, quantity and cost again", "", "error");
                         return;
@@ -123,6 +123,7 @@
                     $scope.item.quantity = 0;
                     $scope.item.name = -1;
                     $scope.item.price = 0;
+                    $scope.config.max_qty = 0;
                 }
 
                 $scope.removeItem = function (index) {
@@ -164,7 +165,13 @@
 
                 $scope.selectedItem = function (name) {
                     /*On change in item*/
-                    //alert(name);
+                    angular.forEach($scope.current_stocks, function (item) {                                   
+                        if (name == item.name) {
+                            $scope.config.max_qty = (item.quantity/1000).toFixed(3);                            
+                            $scope.$apply();
+                            return;
+                        }
+                    });
                 }
 
                 $scope.repeated_items = function () {
@@ -184,6 +191,14 @@
                 }
 
                 $scope.submitStock = function () {
+                    
+                    if(typeof $scope.bill.billno  !== 'number' ||
+                       typeof $scope.bill.reason  !== 'string' ||
+                       typeof $scope.bill.comment !== 'string') {
+                        sweetAlert("Enter the bill details correctly", "", "error");                        
+                        return;
+                    }
+
                     var total_qty = 0, total_cost = 0;
                     if ($scope.invoice.items.length == 0) {
                         return;
@@ -201,28 +216,31 @@
                     }
 
                     swal({
-                        title: "Add Stocks to database",
+                        title: "Sell items",
                         text: "Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost,
                         type: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "Yes, Add it!",
+                        confirmButtonText: "Yes, Sell it!",
                         cancelButtonText: "No, cancel!",
                         closeOnConfirm: false,
                         closeOnCancel: true
                     },
                     function (isConfirm) {
                         if (isConfirm) {
+                            var obj = {};
+                            obj.bill = $scope.bill;
+                            obj.items = $scope.invoice.items;
                             $.ajax({
-                                url: '/api/add_stock',
+                                url: '/api/sell_stock',
                                 type: 'post',
                                 contentType: "application/json",
-                                data: JSON.stringify($scope.invoice.items),
+                                data: JSON.stringify(obj),
                                 success: function (result, textStatus) {
-                                    swal("Added!", "All the items have been added to Database", "success");
+                                    swal("Added!", "All the items have been Sold", "success");
                                 },
                                 error: function (error, textStatus) {
-                                    swal("Failed to insert " + error.responseText + " to Database", "", "error");
+                                    swal("Failed to Sell " + error.responseText, "", "error");
                                 }
                             });
                         }

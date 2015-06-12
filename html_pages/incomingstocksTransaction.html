@@ -21,7 +21,14 @@
             <thead>
                 <tr>
                     <th> 
-                        Trans Id  <font color="blue">[ Total: {{total_items()}} ] </font>
+                        <a href="" ng-click="orderByField='transaction_id'; reverseSort = !reverseSort">
+                            Trans Id
+                            <span ng-show="orderByField == 'transaction_id'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a> 
+                        <font color="blue">[ Total: {{total_items()}} ] </font>
                     </th>
                     <th> 
                         <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
