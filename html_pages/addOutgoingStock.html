@@ -1,0 +1,235 @@
+﻿<div class="container">
+    <h2>{{message}}</h2>
+    <div class="well">
+        <style>
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+
+            select, input {
+                height: 31px;
+                width: 70%;
+                padding: 0.2rem;
+                text-align: left;
+            }
+        </style>
+        <div ng:controller="InputForm">
+            <form name="incomingItems">
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <td>
+                            <b> Bill No</b>
+                            <input id="billno" type="number" ng:model="bill.billno" step="1" min="1" max="50000" tabindex="1" placeholder="Bill Number" style="width:100%">
+                        </td>
+                        <td>
+                            <b>Reason</b>
+                            <select ng-model="bill.reason" style="width:100%" tabindex="2">
+                                <option>Hotel</option>
+                                <option>Distributor</option>
+                                <option>Local Sale</option>
+                                <option>Gift</option>
+                                <option>Others</option>
+                            </select>
+                        </td>
+                        <td>
+                            <b>Comment</b>
+                            <input type="text" ng:model="bill.comment" stabindex="3" placeholder="Comment" style="width:100%">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Item</b>
+                            <select id="selectItem" class="input-block-level" ng-model="item.name"
+                                    ng:change='selectedItem(name)' autofocus style="width:100%" tabindex="4">
+                                <option ng-repeat="item in current_stocks" value="{{item.name}}">
+                                    {{item.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <b>Quantity</b>
+                            <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="5"
+                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" style="width:100%">
+                            <br />
+                            <span>{{qty_to_string(item.quantity)}}</span>
+                        </td>
+                        <td>
+                            <b>Cost</b>
+                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="6" placeholder="Enter Cost" style="width:100%">
+                        </td>
+                        <td>
+                            <br />
+                            <input type="button" value="Add Item" ng:click="addItem()" class="btn btn-primary" tabindex="7" style="width:100%" />
+                        </td>
+                        <td>
+                            <br />
+                            <input type="button" value="Submit Items" class="btn btn-primary" ng-click="submitStock()" tabindex="8" style="width:100%" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <table class="table table-striped table-bordered" >
+                <tr>
+                    <th>Index <font color="blue"> [ Total: {{invoice.items.length}} ]</font></th>
+                    <th>Item Name <font color="red"> {{repeated_items()}}</font></th>
+                    <th>Qty <font color="blue">[ Total: {{total_weight()}} ]</font></th>
+                    <th>Cost <font color="blue"> [ Total: Rs {{total_cost()}} ]</font></th>
+                    <th></th>
+                </tr>
+                <tr ng:repeat="item in invoice.items">
+                    <td>{{$index+1}}</td>
+                    <td>
+                         {{item.name}}
+                    </td>
+                    <td>
+                        <span> {{qty_to_string(item.quantity)}}</span>
+                    </td>
+
+                    <td>
+                        <span> {{item.price}}</span>
+                    </td>
+                    <td>
+                        <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
+                        <a ng:click="removeItem($index)" class="btn btn-primary">X</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script>
+            function InputForm($scope) {
+                $scope.invoice = {
+                    items: [],
+                };
+                document.getElementById("billno").focus();
+
+                $scope.addItem = function () {
+                    document.getElementById("selectItem").focus();
+                    // verify the input paramters
+                    if(typeof $scope.item.name !== 'string' ||
+                       typeof $scope.item.quantity !== 'number' ||
+                       typeof $scope.item.price !== 'number' ||
+                       $scope.item.name == -1 ||
+                       $scope.item.quantity < 0.01 || $scope.item.quantity > $scope.config.max_qty ||
+                       $scope.item.price < 1   || $scope.item.price > $scope.config.max_price)
+                    {
+                        sweetAlert("Verify the name, quantity and cost again", "", "error");
+                        return;
+                    }
+                    $scope.invoice.items.unshift({
+                        quantity: $scope.item.quantity,
+                        name: $scope.item.name,
+                        price: $scope.item.price
+                    });
+                    $scope.item.quantity = 0;
+                    $scope.item.name = -1;
+                    $scope.item.price = 0;
+                }
+
+                $scope.removeItem = function (index) {
+                    $scope.invoice.items.splice(index, 1);
+                }
+
+                $scope.total_cost = function () {
+                    var total = 0;
+                    angular.forEach($scope.invoice.items, function (item) {
+                        total += item.price;
+                    });
+                    return total;
+                }
+
+                $scope.qty_to_string = function (total) {
+                    if (typeof total != 'number' ||
+                        total == 0) {
+                        return "";
+                    }
+
+                    var kg = Math.floor(total);
+                    var gm = ((total - kg) * 1000).toFixed(0);
+
+                    if (kg == 0) {
+                        return "" + gm + "gm";
+                    } else if (gm == 0) {
+                        return "" + kg + "kg";
+                    }
+                    return kg + "kg " + gm + "gm";
+                }
+
+                $scope.total_weight = function () {
+                    var total = 0;
+                    angular.forEach($scope.invoice.items, function (item) {
+                        total += item.quantity;
+                    });
+                    return $scope.qty_to_string(total);
+                }
+
+                $scope.selectedItem = function (name) {
+                    /*On change in item*/
+                    //alert(name);
+                }
+
+                $scope.repeated_items = function () {
+                    var map = [], list = "";
+
+                    angular.forEach($scope.invoice.items, function (item) {
+                        if (map[item.name] == 1) {
+                            list = list == "" ? item.name : (list + "," + item.name);
+                            map[item.name] = 2;
+                        } else {
+                            map[item.name] = 1;
+                        }
+                    });
+
+                    if (list == "") return "";
+                    return "[item " + list + " is repeated]";
+                }
+
+                $scope.submitStock = function () {
+                    var total_qty = 0, total_cost = 0;
+                    if ($scope.invoice.items.length == 0) {
+                        return;
+                    }
+                    angular.forEach($scope.invoice.items, function (item) {
+                        total_qty += item.quantity;
+                        total_cost += item.price;
+                    });
+
+                    // Check if any item is repeated twice. If yes don't proceed further.
+                    var list = $scope.repeated_items();
+                    if (list !== "") {
+                        sweetAlert(list, "", "error");
+                        return;
+                    }
+
+                    swal({
+                        title: "Add Stocks to database",
+                        text: "Total " + $scope.invoice.items.length + " Items, Qty: " + total_qty.toFixed(3) + "KG, Cost: Rs " + total_cost,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, Add it!",
+                        cancelButtonText: "No, cancel!",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $.ajax({
+                                url: '/api/add_stock',
+                                type: 'post',
+                                contentType: "application/json",
+                                data: JSON.stringify($scope.invoice.items),
+                                success: function (result, textStatus) {
+                                    swal("Added!", "All the items have been added to Database", "success");
+                                },
+                                error: function (error, textStatus) {
+                                    swal("Failed to insert " + error.responseText + " to Database", "", "error");
+                                }
+                            });
+                        }
+                        return;
+                    });
+                }
+            }
+        </script>
+    </div>
+</div>
