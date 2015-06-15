@@ -97,7 +97,7 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
 InventoryApp.controller('addIncomingStockController', function($scope) {
     $scope.message = 'Add Incoming Stock to Database';
     $scope.config = {
-        max_qty: 250,
+        max_qty: 750,
         max_price: 75000
     }
     $.ajax({
@@ -115,10 +115,10 @@ InventoryApp.controller('addIncomingStockController', function($scope) {
     });
 
     $scope.$on('$locationChangeStart', function (event) {        
-            var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
-            if (!answer) {
-                event.preventDefault();
-            }        
+        var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
+        if (!answer) {
+            event.preventDefault();
+        }        
     });
     window.onbeforeunload = function (event) {
         var message = 'Sure you want to leave?';
@@ -326,12 +326,12 @@ InventoryApp.controller('outgoingStockController', function ($scope) {
     $scope.message = 'Add Outgoing Stock to Database';
     $scope.config = {
         max_price: 175000,
-        max_qty: 0
+        max_qty: -1
     }
     $scope.bill = {
-        bill: 0,
+        billno: 0,
         reason: 0,
-        comment: 0
+        comment: ""
     }
     $.ajax({
         url: '/api/current_stocks',

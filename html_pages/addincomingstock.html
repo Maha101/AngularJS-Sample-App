@@ -196,8 +196,11 @@
                                 type: 'post',
                                 contentType: "application/json",
                                 data: JSON.stringify($scope.invoice.items),
-                                success: function (result, textStatus) {                                    
-                                    swal("Added!", "All the items have been added to Database", "success");
+                                success: function (result, textStatus) {
+                                    swal.close();
+                                    $scope.invoice.items.length = 0;
+                                    $scope.$apply();
+                                    document.getElementById("selectItem").focus();
                                 },
                                 error: function (error, textStatus) {
                                     swal("Failed to insert " + error.responseText + " to Database", "", "error");

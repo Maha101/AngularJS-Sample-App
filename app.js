@@ -40,7 +40,7 @@ app.get('/scripts/*', function (req, res) {
 });
 
 app.get('/api/get_item_list', function (req, res) {
-    console.log("get_item_list --> ");
+    INFO("get_item_list --> ");
     db.item_list(function(err, obj) {
         if(err == true) {
             res.writeHead(404, { 'Content-Type': 'plain/text' });
