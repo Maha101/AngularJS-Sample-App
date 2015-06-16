@@ -1,3 +1,37 @@
-<div class="jumbotron text-center">
-	<h1>Home Page</h1>		
+<div class="container" ng:controller="homePage">
+    <table class="table table-condensed">
+        <tr>
+            <td><a href="#addOutgoingStock" type="button" class="btn btn-primary btn-lg">&ensp;Add Sale&ensp;</a></td>
+            <td><a href="#addincomingstock" type="button" class="btn btn-primary btn-lg">&ensp;Add Incoming Stock&ensp;</a></td>
+        </tr>
+        <tr>
+            <td><a onclick="SendMail()" class="btn btn-primary btn-lg">&ensp;Send Daily Report Email&ensp;</a></td>            
+            <td><a href="#dailyreport" type="button" class="btn btn-primary btn-lg">&ensp;Show Daily Report&ensp;</a></td>
+        </tr>
+        <tr>
+            <td><a href="#incomingStockSummary" type="button" class="btn btn-primary btn-lg">&ensp;Incoming Stocks Summary&ensp;</a></td>
+            <td><a href="#incomingStockTransaction" type="button" class="btn btn-primary btn-lg">&ensp;Incoming Stocks Transaction&ensp;</a></td>
+        </tr>
+        <tr>
+            <td><a href="#salesSummary" type="button" class="btn btn-primary btn-lg">&ensp;Outgoing Stocks Summary&ensp;</a></td>
+            <td><a href="#salesTransaction" type="button" class="btn btn-primary btn-lg">&ensp;Outgoing Stocks Transaction&ensp;</a></td>
+        </tr>
+        <tr>
+            <td><a href="#" type="button" class="btn btn-primary btn-lg">&ensp;Take Backup&ensp;</a></td>
+        </tr>
+    </table>
+    <script>
+            function SendMail() {
+                $.ajax({
+                    url: '/api/send_report_mail',
+                    type: 'get',                   
+                    success: function (result, textStatus) {
+                        sweetAlert("Email Sent", "", "success");
+                    },
+                    error: function (error, textStatus) {
+                        sweetAlert("Email could not be Sent", "", "error");                        
+                    }
+                });
+            }
+    </script>
 </div>

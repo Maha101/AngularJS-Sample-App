@@ -4,13 +4,13 @@ function SendMail(send_to, mail_subject, mail_body, callback) {
     var transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
-            user: 'kiransj@outlook.com',
-            pass: '1by04CS027'
+            user: 'goldennutsreport@outlook.com',
+            pass: '1by04cs027'
         }
     });
 
     var mailOptions = {
-        from: 'Kiran S J ✔ <kiransj@outlook.com>', // sender address
+        from: 'The Golden Nuts ✔ <goldennutsreport@outlook.com>', // sender address
         to: send_to, 
         subject: mail_subject, // Subject line
         html: mail_body, // plaintext body

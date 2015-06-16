@@ -51,13 +51,13 @@
                         <td>
                             <b>Quantity </b><font color="green">{{qty_to_string(item.quantity)}}</font>
                             <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="5"
-                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" 
+                                   max="{{config.max_qty}}" placeholder="Quantity" 
                                    style="width:100%">                            
                         </td>
                         <td>
                             <b>Cost</b>
                             <input type="number" ng:model="item.price" ng:required step="1" min="1" 
-                                   max="{{config.max_price}}" tabindex="6" placeholder="Enter Cost" 
+                                   max="{{config.max_price}}" tabindex="6" placeholder="Cost Per KG" 
                                    style="width:100%">
                         </td>
                         <td>
@@ -78,21 +78,16 @@
                     <th>Index <font color="blue"> [ Total: {{invoice.items.length}} ]</font></th>
                     <th>Item Name <font color="red"> {{repeated_items()}}</font></th>
                     <th>Qty <font color="blue">[ Total: {{total_weight()}} ]</font></th>
+                    <th>Cost Per KG</th>
                     <th>Cost <font color="blue"> [ Total: Rs {{total_cost()}} ]</font></th>
                     <th></th>
                 </tr>
                 <tr ng:repeat="item in invoice.items">
                     <td>{{$index+1}}</td>
-                    <td>
-                         {{item.name}}
-                    </td>
-                    <td>
-                        <span> {{qty_to_string(item.quantity)}}</span>
-                    </td>
-
-                    <td>
-                        <span> {{item.price}}</span>
-                    </td>
+                    <td>{{item.name}}</td>
+                    <td>{{qty_to_string(item.quantity)}}</td>
+                    <td>{{item.unit_cost}}</td>
+                    <td>{{item.price}}</td>
                     <td>
                         <a ng:click="removeItem($index)" class="btn btn-danger">X</a>
                     </td>
@@ -124,11 +119,13 @@
                     $scope.invoice.items.unshift({
                         quantity: $scope.item.quantity,
                         name: $scope.item.name,
-                        price: $scope.item.price
+                        unit_cost: $scope.item.price,
+                        price: Math.floor($scope.item.price * $scope.item.quantity)
                     });
                     $scope.item.quantity = 0;
                     $scope.item.name = -1;
                     $scope.item.price = 0;
+                    $scope.unit_cost = 0;
                     $scope.config.max_qty = -1;
                 }
 

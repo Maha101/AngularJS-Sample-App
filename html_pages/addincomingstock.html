@@ -28,13 +28,13 @@
                         <td>
                             <b>Quantity</b>
                             <input type="number" ng:model="item.quantity" ng:required step=".001" min=".01" tabindex="2" 
-                                   max="{{config.max_qty}}" placeholder="Enter Qunatity" style="width:100%">
+                                   max="{{config.max_qty}}" placeholder="Quantity" style="width:100%">
                             <br />
                             <span>{{qty_to_string(item.quantity)}}</span>
                         </td>
                         <td>
                             <b>Cost</b>
-                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Enter Cost" style="width:100%">
+                            <input type="number" ng:model="item.price" ng:required step="1" min="1" max="{{config.max_price}}" tabindex="3" placeholder="Cost" style="width:100%">
                         </td>
                         <td>
                             <br />

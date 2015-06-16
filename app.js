@@ -231,7 +231,7 @@ app.post('/api/sell_stock', function (req, res) {
     eventEmitter.emit("next_item");
 });
 
-function sendDailyReport() {
+function sendDailyReport(callback) {
     var count = 0;
     var current_stocks, incoming_stocks, outgoing_stocks;
     eventEmitter.on('done', function () {
@@ -241,7 +241,7 @@ function sendDailyReport() {
             return;
         }
 
-        INFO("Got all data. NOw send email");
+        INFO("Got all data. Now send email");
         eventEmitter.removeAllListeners('done');
         var html_text = "<html><head><title>Daily Report</title></head><body>";
         html_text = "<table border='1'><tr><th>Current Stocks</th><th>Incoming Stocks </th> <th> Outgoing Stocks</th></tr><td>";
@@ -278,9 +278,9 @@ function sendDailyReport() {
         html_text += "</tbody></table></td>";
 
         html_text += "</table></body></html>";
-        INFO(html_text);
+
         mail.SendMail('kiranstalin@gmail.com', 'Daily Report for ' + moment().format('DD-MM-YYYY'), html_text, function(error) {
-            INFO("Send Mail status %s", !error); 
+            callback(error);
         });
         return;
     });
@@ -306,7 +306,23 @@ function sendDailyReport() {
 
 server = http.listen(port, function(){
     console.log("listening on http://%s:%d", hostname, port);
-    sendDailyReport();
+});
+
+
+app.get('/api/send_report_mail', function (req, res) {
+    INFO("send_report_mail --> ");
+
+    sendDailyReport(function(err) {
+        if(err == true) {
+            res.writeHead(404, { 'Content-Type': 'plain/text' });
+            res.end(err);
+        } else {
+            res.writeHead(200, { 'Content-Type': 'plain/text' });
+            res.end("Sent Email");
+        }
+        return;
+    });
+    return;
 });
 
 process.on('SIGTERM', function () {
