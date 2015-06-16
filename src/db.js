@@ -143,7 +143,8 @@ function insert_item(name, callback) {
 
 // Get Item id of an item
 function get_item_id(name, callback) {
-    var stmt = format("SELECT item_id FROM ITEMS WHERE name = '%s'", name.toLowerCase());
+    var stmt = format("SELECT item_id FROM ITEMS WHERE name ='%s' COLLATE  NOCASE", name.toLowerCase());
+    INFO("%s", stmt);
     db.execute_query(stmt, function (err, rows) {
         if (err) {
             ERROR("Query operation for item_id failed with error '%s'", err); 
@@ -151,8 +152,10 @@ function get_item_id(name, callback) {
             return;
         }
         if (rows.length == 1) {
+            INFO("item id of %s is %d", name, rows[0].item_id);
             callback(false, rows[0].item_id);
         } else if (rows.length == 0) {
+            ERROR("item '%s' does not exists", name);
             callback(true, format("Item '%s' does not exists", name));
         } else {
             ERROR("More than 1 id(%d) exists for name = '%s'", rows.length, name);
@@ -425,6 +428,92 @@ function get_sales_details(obj, callback) {
 
 }
 
+
+// Usage 
+// obj is json with the following variables.
+//      name     => name of the item to which stocks should be added
+//      quantity => quantity of the stocks in gms
+//      price    => price paid for the Stocks
+//      date     => date of the incoming stocks. [Default value is today's date]
+//      time     => time of the incoming stocks. [Default value is current time]
+// callback takes one arguments which tells wheather there is an error or not
+
+function sell_stock(obj, callback) {
+    
+    //Check if the obj has the required information to run the query.
+    //check the type of the parameters passed.
+    if (typeof obj.name !== 'string' || 
+       typeof obj.quantity !== 'number' || 
+       typeof obj.price !== 'number') {
+        ERROR("required input doesnt exists in correct format to add stocks to db");
+        process.nextTick(function () {
+            callback(true, "malformed request");
+            return;
+        });
+        return;
+    }
+    
+    // Sanity check that the quantity and price are not less than 0
+    if (obj.quantity <= 0 ||
+       obj.price <= 0) {
+        ERROR("price or quantity is less than 0");
+        process.nextTick(function () {
+            callback(true, "price or quantity is less than 0");
+            return;
+        });
+        return;
+    }
+    
+    // Set date and time if not set.
+    if (typeof obj.date === 'undefined') {
+        obj.date = date_now();
+    }
+    
+    if (typeof obj.time === 'undefined') {
+        obj.time = time_now();
+    }
+    
+    // Check the format of date and time.
+    if (!moment(obj.date, "YYYY-MM-DD").isValid() || 
+       !moment(obj.time, "HH-mm-ss").isValid()) {
+        ERROR("date and time not in required format");
+        process.nextTick(function () {
+            callback(true, "malformed request");
+            return;
+        });
+        return;
+    }
+    
+    // Get the item_id of the name to run the query.
+    get_item_id(obj.name, function (err, item_id) {
+        if (err) {
+            ERROR("item name '%s' does not exists in DB", obj.name);
+            callback(true, err);
+            return;
+        }
+        var stmt = format("INSERT INTO outgoing_stocks (item_id, quantity, price, dt, tm, transaction_type, reason) values(%d, %d, %d, '%s', '%s', '%s', '%s');",
+                          item_id,
+                          obj.quantity,
+                          obj.price,
+                          obj.date,
+                          obj.time,
+                          obj.transaction_type,
+                          obj.reason);
+        INFO("%s", stmt);
+        db.execute_query(stmt, function (err, rows) {
+            if (err) {
+                ERROR("Selling  %s failed due to '%s'", obj.name, err);
+                callback(true, err);
+                return;
+            }
+            var msg = format("Added %d gms of '%s' to db", obj.quantity, obj.name);
+            callback(false, msg);
+            return;
+        });
+        return;
+    });
+}
+
 module.exports = {
     open: db.open,
     status: db.status,
@@ -439,6 +528,7 @@ module.exports = {
 
     add_stock: add_incoming_stock,
     get_stock_details: get_stock_details,
-
+    
+    sell_stock: sell_stock,
     get_sales_details: get_sales_details
 };

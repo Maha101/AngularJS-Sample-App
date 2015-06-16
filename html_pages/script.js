@@ -1,6 +1,22 @@
 // create the module and name it InventoryApp
 var InventoryApp = angular.module('InventoryApp', ['ngRoute']);
 
+InventoryApp.run(function ($window, $rootScope) {
+    $rootScope.online = navigator.onLine;
+    $window.addEventListener("offline", function () {
+        $rootScope.$apply(function () {
+            $rootScope.online = false;
+            alert("offline");
+        });
+    }, false);
+    $window.addEventListener("online", function () {
+        $rootScope.$apply(function () {
+            $rootScope.online = true;
+            alert("online");
+        });
+    }, false);
+});
+
 // configure our routes
 InventoryApp.config(function($routeProvider) {
 	$routeProvider
@@ -57,7 +73,18 @@ InventoryApp.config(function($routeProvider) {
 		.when('/newitem', {
             templateUrl : 'pages/newitem.html',
             controller  : 'newItemController'
-        });            
+        })
+
+        .when('/addOutgoingStock', {
+            templateUrl : 'pages/addOutgoingStock.html',
+            controller  : 'outgoingStockController'
+        })
+
+        .when('/dailyreport', {
+            templateUrl : 'pages/dailyReport.html',
+            controller  : 'dailyReportController'
+        });
+
 });
 
 
@@ -72,31 +99,57 @@ InventoryApp.controller('aboutController', function($scope, $routeParams) {
     //$scope.userName = "kiran" + $routeParams.userName;
 });
 
-InventoryApp.controller('addIncomingStockController', function($scope) {
-    $scope.message = 'Add Incoming Stock to Database';
-    $scope.config = {
-        max_qty: 250,
-        max_price: 75000
-    }
+
+InventoryApp.controller('dailyReportController', function ($scope) {
+    $scope.message = 'DailyReport';
+    $scope.orderByField = 'name';
+    $scope.reverseSort = false;
+    
+    from = moment().format('YYYY-MM-DD');
+    to = moment().format('YYYY-MM-DD');
+    // Get Incoming Stocks Summary
     $.ajax({
-        url: '/api/get_item_list',
+        url: '/api/get_incoming_stock?summary=true&from=' +from + "&to=" + to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.incoming_stocks = result;                        
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get Incoming Stock Summary';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+
+    // get outgoing Stocks Summary
+    $.ajax({
+        url: '/api/get_outgoing_stock?summary=true&from=' + from + "&to=" + to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.outgoing_stocks = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get Outgoing Stock Summary';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+
+    // Get Item list
+    $.ajax({
+        url: '/api/current_stocks',
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
             $scope.$apply();
         },
         error: function (error) {
-            $scope.message = 'Failed to current stock list';
+            $scope.message = 'Failed to get current Stocks';
             angular.element('.container').css('background-color', '#FF0000');
-            $scope.$apply()
+            $scope.$apply();
         }
-    });
-
-    $scope.$on('$locationChangeStart', function (event) {        
-            var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
-            if (!answer) {
-                event.preventDefault();
-            }        
     });
 });
 
@@ -239,24 +292,63 @@ InventoryApp.controller('incomingStockTransactionController', function ($scope, 
     });
 });
 
-InventoryApp.controller('salesSummaryController', function ($scope, $routeParams) {
-    $scope.from = typeof $routeParams.from === 'undefined' ?  moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
-    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
-    $scope.message = 'Sales Summary';
-    
-    $scope.orderByField = 'name';
-    $scope.reverseSort = false;
-    
-    // Use Ajax to get data
+InventoryApp.controller('addIncomingStockController', function ($scope) {
+    $scope.message = 'Add Incoming Stock to Database';
+    $scope.config = {
+        max_qty: 750,
+        max_price: 75000
+    }
     $.ajax({
-        url: '/api/get_incoming_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
+        url: '/api/get_item_list',
         type: 'GET',        
         success: function (result) {
             $scope.item_list = result;
             $scope.$apply();
         },
         error: function (error) {
-            $scope.message = 'Failed to get Incoming Stock Summary';
+            $scope.message = 'Failed to get Item List list';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+    
+    $scope.$on('$locationChangeStart', function (event) {
+        var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
+        if (!answer) {
+            event.preventDefault();
+        }
+    });
+    window.onbeforeunload = function (event) {
+        var message = 'Sure you want to leave?';
+        if (typeof event == 'undefined') {
+            event = window.event;
+        }
+        if (event) {
+            event.returnValue = message;
+            window.onbeforeunload = null;
+        }
+        return message;
+    }
+});
+
+InventoryApp.controller('salesSummaryController', function ($scope, $routeParams) {
+    $scope.from = typeof $routeParams.from === 'undefined' ?  moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
+    $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
+    $scope.message = 'Outgoing Stocks Summary';
+    
+    $scope.orderByField = 'name';
+    $scope.reverseSort = false;
+    
+    // Use Ajax to get data
+    $.ajax({
+        url: '/api/get_outgoing_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
+        type: 'GET',        
+        success: function (result) {
+            $scope.item_list = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get Outgoing Stock Summary';
             angular.element('.container').css('background-color', '#FF0000');
             $scope.$apply()
         }
@@ -266,7 +358,7 @@ InventoryApp.controller('salesSummaryController', function ($scope, $routeParams
 InventoryApp.controller('salesTransactionController', function ($scope, $routeParams) {
     $scope.from = typeof $routeParams.from === 'undefined' ? moment().subtract('days', 7).format('YYYY-MM-DD') : $routeParams.from;
     $scope.to = typeof $routeParams.to === 'undefined' ? moment().format('YYYY-MM-DD') : $routeParams.to;
-    $scope.message = 'Sales Transaction Details';
+    $scope.message = 'Outgoing Stocks Details';
     
     $scope.orderByField = 'dt';
     $scope.reverseSort = false;
@@ -274,7 +366,8 @@ InventoryApp.controller('salesTransactionController', function ($scope, $routePa
     // Use Ajax to get data
     $.ajax({
         url: '/api/get_outgoing_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
-        type: 'GET',        
+        type: 'GET',
+        timeout: 8000,        
         success: function (result) {
             $scope.item_list = result;
             $scope.$apply();
@@ -285,4 +378,50 @@ InventoryApp.controller('salesTransactionController', function ($scope, $routePa
             $scope.$apply()
         }
     });
+});
+
+InventoryApp.controller('outgoingStockController', function ($scope) {
+    
+    $scope.message = 'Add Outgoing Stock to Database';
+    $scope.config = {
+        max_price: 175000,
+        max_qty: -1
+    }
+    $scope.bill = {
+        billno: 0,
+        reason: 0,
+        comment: ""
+    }
+    $.ajax({
+        url: '/api/current_stocks',
+        type: 'GET',        
+        success: function (result) {
+            $scope.current_stocks = result;
+            $scope.$apply();
+        },
+        error: function (error) {
+            $scope.message = 'Failed to get current stock';
+            angular.element('.container').css('background-color', '#FF0000');
+            $scope.$apply()
+        }
+    });
+    
+    $scope.$on('$locationChangeStart', function (event) {
+        var answer = confirm("Are you sure you want to leave this page without submiting chnanges?");
+        if (!answer) {
+            event.preventDefault();
+        }
+    });
+
+    window.onbeforeunload = function (event) {
+        var message = 'Sure you want to leave?';
+        if (typeof event == 'undefined') {
+            event = window.event;
+        }
+        if (event) {
+            event.returnValue = message;
+            window.onbeforeunload = null;
+        }
+        return message;
+    }
 });

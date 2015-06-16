@@ -5,7 +5,8 @@
 var db = require('./src/db');
 
 var debug = require('debug'),
-    events = require('events');
+    events = require('events'),
+    util = require('util');
 
 var INFO  = debug('APP:INFO');
 var ERROR = debug('APP:ERR');
@@ -39,7 +40,7 @@ app.get('/scripts/*', function (req, res) {
 });
 
 app.get('/api/get_item_list', function (req, res) {
-    console.log("get_item_list --> ");
+    INFO("get_item_list --> ");
     db.item_list(function(err, obj) {
         if(err == true) {
             res.writeHead(404, { 'Content-Type': 'plain/text' });
@@ -159,6 +160,7 @@ app.post('/api/add_stock', function (req, res) {
     var failed_list = "";
     var obj = req.body;
     var count = -1;
+       
     eventEmitter.on('next_item', function () {
         count++;
         if (count < obj.length) {
@@ -186,6 +188,45 @@ app.post('/api/add_stock', function (req, res) {
         }
     });
     eventEmitter.emit("next_item");    
+});
+
+app.post('/api/sell_stock', function (req, res) {
+    var obj = {};
+    INFO("%s", JSON.stringify(req.body));
+    var failed_list = "";
+    var sell_obj = req.body;
+    var obj = sell_obj.items;
+    var bill = sell_obj.bill;
+    var count = -1;
+    eventEmitter.on('next_item', function () {
+        count++;
+        if (count < obj.length) {
+            obj[count].quantity *= 1000;
+            obj[count].transaction_type = bill.reason;
+            obj[count].reason = util.format("bill%s,%s", bill.billno, bill.comment);
+            INFO("Inserting Stock %s -> Q: %d -> P: %d", obj[count].name, obj[count].quantity, obj[count].price);
+            db.sell_stock(obj[count], function (error, msg) {
+                if (error === true) {
+                    failed_list = failed_list + (failed_list == "" ?  "" : ",") + obj[count].name;
+                }
+                eventEmitter.emit("next_item");
+                return;
+            });
+        } else {
+            eventEmitter.removeAllListeners('next_item');
+            
+            if (failed_list == "") {
+                INFO("inserted all the elemented to DB");
+                res.writeHead(200, "OK", { 'Content-Type': 'text/plain' });
+                res.end("kiran");
+            } else {
+                ERROR("Failed to insert items : %s", failed_list);
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end(failed_list);
+            }
+        }
+    });
+    eventEmitter.emit("next_item");
 });
 
 

@@ -2,7 +2,7 @@
     <h2>{{message}}</h2>
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
-    <div class="well" ng:controller="incomingStockTransaction">
+    <div class="well" ng:controller="outgoingStockTransaction">
         <form ng-submit="load_page()">
             From <input type="text" id="from_date" ng-model="from">
             To <input type="text" id="to_date" ng-model="to">
@@ -20,7 +20,16 @@
         <table class="table table-striped table-bordered ">
             <thead>
                 <tr>
-                    <th> Trans Id  <font color="blue">[ Total: {{total_items()}} ] </font></th>
+                    <th>                         
+                        <a href="" ng-click="orderByField='transaction_id'; reverseSort = !reverseSort">
+                            Trans Id
+                            <span ng-show="orderByField == 'transaction_id'">
+                                <span ng-show="!reverseSort">^</span>
+                                <span ng-show="reverseSort">v</span>
+                            </span>
+                        </a>
+                        <font color="blue">[ Total: {{total_items()}} ] </font>
+                    </th>
                     <th>
                         <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
                             Item Name
@@ -93,7 +102,7 @@
         </table>
     </div>
     <script>
-        function incomingStockTransaction($scope) {
+        function outgoingStockTransaction($scope) {
             $scope.load_page = function () {
             $.ajax({
                 url: '/api/get_outgoing_stock?summary=false&from=' + $scope.from + "&to=" + $scope.to,
@@ -104,7 +113,7 @@
                     $scope.$apply();
                 },
                 error: function (error) {
-                    $scope.message = 'Failed to get incoming Stock Details';
+                    $scope.message = 'Failed to get Sales Transaction Details';
                     angular.element('.container').css('background-color', '#FF0000');
                     $scope.$apply()
                 }

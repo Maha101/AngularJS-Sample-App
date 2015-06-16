@@ -2,22 +2,12 @@
     <h2>{{message}}</h2>
 
     <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
-
     <div class="well" ng:controller="outgoingStockSummary">
-        <form ng-submit="load_page()">
-            <style>
-                input[type=date] {
-                    height: 35px;
-                    text-align: center;
-                    width: 100px;
-                }
-            </style>
+        <form ng-submit="load_page()">            
             From <input type="text" id="from_date" ng-model="from">
             To <input type="text" id="to_date" ng-model="to">
-            <input type="submit" value="submit" class="btn btn-primary" />
-
+            <input type="submit" value="submit" class="btn btn-primary" />            
         </form>
-
         <br />
         <form>
             <div class="form-group">
@@ -30,7 +20,9 @@
         <table class="table table-striped table-bordered ">
             <thead>
                 <tr>
-                    <th> Index <font color="blue">[ Total: {{total_items()}} ] </font></th>
+                    <th> 
+                        Index <font color="blue">[ Total: {{total_items()}} ] </font>
+                    </th>
                     <th>
                         <a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">
                             Item Name
@@ -84,20 +76,26 @@
     </div>
     <script>
         function outgoingStockSummary($scope) {
+            
             $scope.load_page = function () {
+                if($scope.from.length < 10 ||
+                   $scope.to.length < 10) {
+                    return;
+                }                
+                
                 $.ajax({
                     url: '/api/get_outgoing_stock?summary=true&from=' + $scope.from + "&to=" + $scope.to,
                     type: 'GET',
                     success: function (result) {
-                        $scope.item_list = result;
+                        $scope.item_list = result;                        
                         angular.element('.container').css('background-color', '#FFFFFF');
                         $scope.$apply();
                     },
                     error: function (error) {
-                        $scope.message = 'Failed to get incoming Stock Summary';
+                        $scope.state = 'Failed to get Sales Summary from ' + $scope.from + " to " + $scope.to;
                         angular.element('.container').css('background-color', '#FF0000');
                         $scope.$apply()
-                    }
+                    },                    
                 });
             }
             $scope.total_quantity = function () {

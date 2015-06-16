@@ -1,0 +1,122 @@
+﻿<div ng:controller="dailyReport">
+
+    <!-- https://scotch.io/tutorials/sort-and-filter-a-table-using-angular -->
+    <div class="col-xs-4">
+        <div class="table-responsive">
+            <table class=" table table-striped table-condensed ">
+                <caption><h2>Current Stocks</h2></caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Item Name
+                        </th>
+                        <th>
+                            Quantity [total {{total_stocks()}}]
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in item_list | filter:search | orderBy:orderByField:reverseSort" ng-if="item.quantity > 0">
+                        <td>{{ item.name }}</td>
+                        <td>{{ (item.quantity/1000).toFixed(3) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <div class="table-responsive">
+            <table class=" table table-striped table-condensed ">
+                <caption><h2>Incoming Stocks</h2></caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Item Name
+                        </th>
+                        <th>
+                            Quantity [Total {{ total_incoming_quantity() }}]
+                        </th>
+                        <th>
+                            Price [Total {{ total_incoming_cost() }}]
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in incoming_stocks | filter:search | orderBy:orderByField:reverseSort">
+                        <td>{{ item.name }}</td>
+                        <td>{{ (item.quantity/1000).toFixed(3) }}</td>
+                        <td>{{ (item.price) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <div class="table-responsive">
+            <table class=" table table-striped table-condensed ">
+                <caption><h2>Outgoing Stocks</h2></caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Item Name
+                        </th>
+                        <th>
+                            Quantity [Total {{ total_incoming_quantity() }}]
+                        </th>
+                        <th>
+                            Price [Total {{ total_incoming_cost() }}]
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in outgoing_stocks | filter:search | orderBy:orderByField:reverseSort">
+                        <td>{{ item.name }}</td>
+                        <td>{{ (item.quantity/1000).toFixed(3) }}</td>
+                        <td>{{ (item.price) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function dailyReport($scope) {
+        $scope.total_incoming_quantity = function () {
+            var total = 0;
+            angular.forEach($scope.incoming_stocks, function (item) {
+                total += item.quantity;
+            })
+            return (total / 1000).toFixed(3) + "Kg";
+        }
+        $scope.total_incoming_cost = function () {
+            var total = 0;
+            angular.forEach($scope.incoming_stocks, function (item) {
+                total += item.price;
+            })
+            return (total);
+        }
+
+        $scope.total_outgoing_quantity = function () {
+            var total = 0;
+            angular.forEach($scope.outgoing_stocks, function (item) {
+                total += item.quantity;
+            })
+            return (total / 1000).toFixed(3) + "Kg";
+        }
+        $scope.total_outgoing_cost = function () {
+            var total = 0;
+            angular.forEach($scope.outgoing_stocks, function (item) {
+                total += item.price;
+            })
+            return (total);
+        }
+        $scope.total_stocks  = function () {
+            var total = 0;
+            angular.forEach($scope.item_list, function (item) {
+                total += item.quantity;
+            })
+            return (total / 1000).toFixed(3) + "Kg";
+        }
+
+    }
+</script>
