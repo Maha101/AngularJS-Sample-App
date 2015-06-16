@@ -248,38 +248,41 @@ function sendDailyReport() {
         var i = 0;
         html_text += "<table border='1'><thead><tr><th>Item Name</th><th>Quantity</th></tr></thead><tbody>";        
         for(i = 0; i < current_stocks.length; i++) {
-           html_text += "<tr>"; 
-           html_text += "<td>" + current_stocks[i].name + "</td>"; 
-           html_text += "<td>" + (current_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
-           html_text += "</tr>"; 
+            if(current_stocks[i].quantity > 1) {
+                html_text += "<tr>"; 
+                html_text += "<td>" + current_stocks[i].name + "</td>"; 
+                html_text += "<td>" + (current_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
+                html_text += "</tr>"; 
+            }
         }
-        html_text += "</tbody></table></td><td>";
+        html_text += "</tbody></table></td><td valign='top'>";
 
         html_text += "<table border='1'><thead><tr><th>Item Name</th><th>Quantity</th><th>Price</th></tr></thead><tbody>";
         for(i = 0; i < incoming_stocks.length; i++) {
-           html_text += "<tr>"; 
-           html_text += "<td>" + incoming_stocks[i].name + "</td>"; 
-           html_text += "<td>" + (incoming_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
-           html_text += "<td>" + incoming_stocks[i].price+ "</td>"; 
-           html_text += "</tr>"; 
+            html_text += "<tr>"; 
+            html_text += "<td>" + incoming_stocks[i].name + "</td>"; 
+            html_text += "<td>" + (incoming_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
+            html_text += "<td>" + incoming_stocks[i].price+ "</td>"; 
+            html_text += "</tr>"; 
         }
-        html_text += "</tbody></table></td><td>";
+        html_text += "</tbody></table></td><td valign='top'>";
 
         html_text += "<table border='1'><thead><tr><th>Item Name</th><th>Quantity</th><th>Price</th></tr></thead><tbody>";
         for(i = 0; i < outgoing_stocks.length; i++) {
-           html_text += "<tr>"; 
-           html_text += "<td>" + outgoing_stocks[i].name + "</td>"; 
-           html_text += "<td>" + (outgoing_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
-           html_text += "<td>" + outgoing_stocks[i].price+ "</td>"; 
-           html_text += "</tr>"; 
+            html_text += "<tr>"; 
+            html_text += "<td>" + outgoing_stocks[i].name + "</td>"; 
+            html_text += "<td>" + (outgoing_stocks[i].quantity/1000).toFixed(3)+ "</td>"; 
+            html_text += "<td>" + outgoing_stocks[i].price+ "</td>"; 
+            html_text += "</tr>"; 
         }
         html_text += "</tbody></table></td>";
 
         html_text += "</table></body></html>";
         INFO(html_text);
         mail.SendMail('kiranstalin@gmail.com', 'Daily Report for ' + moment().format('DD-MM-YYYY'), html_text, function(error) {
-            INFO("Send Mail status %s", error);                
+            INFO("Send Mail status %s", !error); 
         });
+        return;
     });
 
     db.current_stocks(function(err, obj) {

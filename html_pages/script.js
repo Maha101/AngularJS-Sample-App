@@ -96,6 +96,13 @@ InventoryApp.controller('mainController', function($scope) {
 
 InventoryApp.controller('aboutController', function($scope, $routeParams) {
     $scope.message = 'Look! I am an about page. ' + $routeParams.userName;
+    $scope.items = [{ name: "cashew", price: 100 }, { name: "pepper", price: 200 }, { name: "dry", price: 300 }];
+    $scope.headers = [];
+    var count = 0;
+    for (i in $scope.items[0]) {
+        $scope.headers[count] = i;
+        count++;
+    }
     //$scope.userName = "kiran" + $routeParams.userName;
 });
 
